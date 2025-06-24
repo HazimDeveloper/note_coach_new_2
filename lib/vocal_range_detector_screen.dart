@@ -1,57 +1,58 @@
-// lib/vocal_range_detector_screen.dart
+// lib/vocal_range_detector_enhanced.dart
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:record/record.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'dart:math';
 import 'dart:async';
+import 'dart:io';
 
-class VocalRangeDetectorScreen extends StatefulWidget {
+class VocalRangeDetectorEnhanced extends StatefulWidget {
   @override
-  _VocalRangeDetectorScreenState createState() => _VocalRangeDetectorScreenState();
+  _VocalRangeDetectorEnhancedState createState() => _VocalRangeDetectorEnhancedState();
 }
 
-class _VocalRangeDetectorScreenState extends State<VocalRangeDetectorScreen>
+class _VocalRangeDetectorEnhancedState extends State<VocalRangeDetectorEnhanced>
     with TickerProviderStateMixin {
 
-  // Musical notes with frequencies (same as your original code)
+  // Audio instances
+  final AudioRecorder _recorder = AudioRecorder();
+  final AudioPlayer _player = AudioPlayer();
+
+  // Musical notes with frequencies
   final List<Map<String, dynamic>> musicalNotes = [
     {'note': 'F2', 'frequency': 87.31},
-    {'note': 'F#2/G♭2', 'frequency': 92.50},
     {'note': 'G2', 'frequency': 98.00},
-    {'note': 'G#2/A♭2', 'frequency': 103.83},
     {'note': 'A2', 'frequency': 110.00},
-    {'note': 'A#2/B♭2', 'frequency': 116.54},
     {'note': 'B2', 'frequency': 123.47},
     {'note': 'C3', 'frequency': 130.81},
-    {'note': 'C#3/D♭3', 'frequency': 138.59},
     {'note': 'D3', 'frequency': 146.83},
-    {'note': 'D#3/E♭3', 'frequency': 155.56},
     {'note': 'E3', 'frequency': 164.81},
     {'note': 'F3', 'frequency': 174.61},
-    {'note': 'F#3/G♭3', 'frequency': 185.00},
     {'note': 'G3', 'frequency': 196.00},
-    {'note': 'G#3/A♭3', 'frequency': 207.65},
     {'note': 'A3', 'frequency': 220.00},
-    {'note': 'A#3/B♭3', 'frequency': 233.08},
     {'note': 'B3', 'frequency': 246.94},
     {'note': 'C4', 'frequency': 261.63},
-    {'note': 'C#4/D♭4', 'frequency': 277.18},
     {'note': 'D4', 'frequency': 293.66},
-    {'note': 'D#4/E♭4', 'frequency': 311.13},
     {'note': 'E4', 'frequency': 329.63},
     {'note': 'F4', 'frequency': 349.23},
-    {'note': 'F#4/G♭4', 'frequency': 369.99},
     {'note': 'G4', 'frequency': 392.00},
-    {'note': 'G#4/A♭4', 'frequency': 415.30},
     {'note': 'A4', 'frequency': 440.00},
-    {'note': 'A#4/B♭4', 'frequency': 466.16},
     {'note': 'B4', 'frequency': 493.88},
     {'note': 'C5', 'frequency': 523.25},
   ];
 
   // Test states
-  String currentStep = 'start'; // start, lowest, highest, results
+  String currentStep = 'start';
   bool isRecording = false;
+  bool isPlayingBack = false;
   String detectedNote = '';
   double detectedFrequency = 0.0;
+  
+  // Recording paths
+  String? lowestRecordingPath;
+  String? highestRecordingPath;
   
   // Results
   String lowestNote = '';
@@ -72,6 +73,7 @@ class _VocalRangeDetectorScreenState extends State<VocalRangeDetectorScreen>
   @override
   void initState() {
     super.initState();
+    _initializeAudio();
     pulseController = AnimationController(
       duration: Duration(milliseconds: 800),
       vsync: this,
@@ -86,41 +88,104 @@ class _VocalRangeDetectorScreenState extends State<VocalRangeDetectorScreen>
     pulseController?.dispose();
     recordingTimer?.cancel();
     simulationTimer?.cancel();
+    _recorder.dispose();
+    _player.dispose();
     super.dispose();
   }
 
-  void startLowestTest() {
-    setState(() {
-      currentStep = 'lowest';
-      isRecording = true;
-      detectedNote = '';
-      detectedFrequency = 0.0;
-    });
-    
-    pulseController!.repeat(reverse: true);
-    startFrequencySimulation();
-    
-    // Auto stop after 8 seconds
-    recordingTimer = Timer(Duration(seconds: 8), () {
-      stopRecording();
-    });
+  Future<void> _initializeAudio() async {
+    // Request microphone permission
+    final status = await Permission.microphone.request();
+    if (status != PermissionStatus.granted) {
+      print('Microphone permission denied');
+    }
   }
 
-  void startHighestTest() {
-    setState(() {
-      currentStep = 'highest';
-      isRecording = true;
-      detectedNote = '';
-      detectedFrequency = 0.0;
-    });
-    
-    pulseController!.repeat(reverse: true);
-    startFrequencySimulation();
-    
-    // Auto stop after 8 seconds
-    recordingTimer = Timer(Duration(seconds: 8), () {
-      stopRecording();
-    });
+  Future<String> _getRecordingPath(String fileName) async {
+    final directory = await getApplicationDocumentsDirectory();
+    return '${directory.path}/$fileName';
+  }
+
+  void startLowestTest() async {
+    try {
+      setState(() {
+        currentStep = 'lowest';
+        isRecording = true;
+        detectedNote = '';
+        detectedFrequency = 0.0;
+      });
+      
+      pulseController!.repeat(reverse: true);
+      
+      // Start recording
+      final path = await _getRecordingPath('lowest_note_${DateTime.now().millisecondsSinceEpoch}.m4a');
+      
+      if (await _recorder.hasPermission()) {
+        await _recorder.start(
+          const RecordConfig(
+            encoder: AudioEncoder.aacLc,
+            bitRate: 128000,
+            sampleRate: 44100,
+          ),
+          path: path,
+        );
+        
+        lowestRecordingPath = path;
+        startFrequencySimulation();
+        
+        // Auto stop after 8 seconds
+        recordingTimer = Timer(Duration(seconds: 8), () {
+          stopRecording();
+        });
+      }
+    } catch (e) {
+      print('Error starting recording: $e');
+      setState(() {
+        isRecording = false;
+        currentStep = 'start';
+      });
+    }
+  }
+
+  void startHighestTest() async {
+    try {
+      setState(() {
+        currentStep = 'highest';
+        isRecording = true;
+        detectedNote = '';
+        detectedFrequency = 0.0;
+      });
+      
+      pulseController!.repeat(reverse: true);
+      
+      // Start recording
+      final path = await _getRecordingPath('highest_note_${DateTime.now().millisecondsSinceEpoch}.m4a');
+      
+      if (await _recorder.hasPermission()) {
+        await _recorder.start(
+          const RecordConfig(
+            encoder: AudioEncoder.aacLc,
+            bitRate: 128000,
+            sampleRate: 44100,
+          ),
+          path: path,
+        );
+        
+        highestRecordingPath = path;
+        startFrequencySimulation();
+        
+        // Auto stop after 8 seconds
+        recordingTimer = Timer(Duration(seconds: 8), () {
+          stopRecording();
+        });
+      }
+    } catch (e) {
+      print('Error starting recording: $e');
+      setState(() {
+        isRecording = false;
+        currentStep = 'lowest';
+      });
+    }
   }
 
   void startFrequencySimulation() {
@@ -132,22 +197,17 @@ class _VocalRangeDetectorScreenState extends State<VocalRangeDetectorScreen>
         return;
       }
 
-      // Simulate frequency detection based on current step
       double simulatedFreq;
       if (currentStep == 'lowest') {
-        // Simulate lower frequencies for lowest test
-        simulatedFreq = 100 + random.nextDouble() * 150; // 100-250 Hz range
+        simulatedFreq = 100 + random.nextDouble() * 150;
       } else {
-        // Simulate higher frequencies for highest test
-        simulatedFreq = 250 + random.nextDouble() * 200; // 250-450 Hz range
+        simulatedFreq = 250 + random.nextDouble() * 200;
       }
 
-      // Generate waveform data
       for (int i = 0; i < waveformData.length; i++) {
-        waveformData[i] = random.nextDouble() * 2 - 1; // -1 to 1
+        waveformData[i] = random.nextDouble() * 2 - 1;
       }
 
-      // Find closest note
       String closestNote = '';
       double closestDiff = double.infinity;
       
@@ -166,38 +226,41 @@ class _VocalRangeDetectorScreenState extends State<VocalRangeDetectorScreen>
     });
   }
 
-  void stopRecording() {
-    setState(() {
-      isRecording = false;
-    });
-    
-    pulseController!.stop();
-    pulseController!.reset();
-    recordingTimer?.cancel();
-    simulationTimer?.cancel();
+  void stopRecording() async {
+    try {
+      setState(() {
+        isRecording = false;
+      });
+      
+      pulseController!.stop();
+      pulseController!.reset();
+      recordingTimer?.cancel();
+      simulationTimer?.cancel();
 
-    // Save the detected note
-    if (detectedNote.isNotEmpty) {
-      if (currentStep == 'lowest') {
-        lowestNote = detectedNote;
-        lowestFrequency = detectedFrequency;
-        
-        // Wait a moment then start highest test
-        Timer(Duration(seconds: 1), () {
-          startHighestTest();
-        });
-      } else {
-        // Highest test completed
-        highestNote = detectedNote;
-        highestFrequency = detectedFrequency;
-        calculateVocalRange();
-        showResults();
+      // Stop recording
+      await _recorder.stop();
+
+      if (detectedNote.isNotEmpty) {
+        if (currentStep == 'lowest') {
+          lowestNote = detectedNote;
+          lowestFrequency = detectedFrequency;
+          
+          Timer(Duration(seconds: 1), () {
+            startHighestTest();
+          });
+        } else {
+          highestNote = detectedNote;
+          highestFrequency = detectedFrequency;
+          calculateVocalRange();
+          showResults();
+        }
       }
+    } catch (e) {
+      print('Error stopping recording: $e');
     }
   }
 
   void calculateVocalRange() {
-    // Enhanced vocal range classification
     if (lowestFrequency <= 130 && highestFrequency <= 260) {
       vocalRange = 'BASS';
     } else if (lowestFrequency <= 130 && highestFrequency <= 349) {
@@ -217,103 +280,146 @@ class _VocalRangeDetectorScreenState extends State<VocalRangeDetectorScreen>
     });
   }
 
+  Future<void> _playRecording(String? path) async {
+    if (path == null || !File(path).existsSync()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Recording not found')),
+      );
+      return;
+    }
+
+    try {
+      setState(() {
+        isPlayingBack = true;
+      });
+
+      await _player.play(DeviceFileSource(path));
+      
+      _player.onPlayerComplete.listen((_) {
+        if (mounted) {
+          setState(() {
+            isPlayingBack = false;
+          });
+        }
+      });
+
+    } catch (e) {
+      print('Error playing recording: $e');
+      setState(() {
+        isPlayingBack = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error playing recording')),
+      );
+    }
+  }
+
   void showResults() {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        backgroundColor: Color(0xFF1a1a1a),
+        backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         content: Container(
           width: 300,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Summary header
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundColor: Color(0xFF2196F3),
+                    child: Text('AH', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                  ),
+                  SizedBox(width: 12),
+                  Text(
+                    'Learning Course',
+                    style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              
+              SizedBox(height: 20),
+              
               Container(
-                padding: EdgeInsets.all(16),
+                padding: EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Color(0xFF2a2a2a),
+                  color: Color(0xFFF5F5F5),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.summarize, color: Colors.white, size: 20),
+                    Icon(Icons.summarize, color: Colors.black, size: 16),
                     SizedBox(width: 8),
                     Text(
                       'Summary',
-                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14),
                     ),
                   ],
                 ),
               ),
               
-              // Step Information (like in report)
-          Container(
-            margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            padding: EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Color(0xFF1a1a1a),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey[800]!, width: 1),
-            ),
-            child: Text(
-              getStepInfo(),
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: 13,
-                height: 1.3,
-              ),
-            ),
-          ),
-
-          SizedBox(height: 10),
+              SizedBox(height: 16),
               
-              // Results section with waveform visualization
               Text(
                 'Results',
-                style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              
+              SizedBox(height: 12),
+              
+              // Waveform
+              Container(
+                height: 80,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Color(0xFFF5F5F5),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(15, (index) {
+                      final random = Random();
+                      final height = random.nextDouble() * 40 + 10;
+                      return Container(
+                        width: 6,
+                        height: height,
+                        margin: EdgeInsets.symmetric(horizontal: 2),
+                        decoration: BoxDecoration(
+                          color: Color(0xFF2196F3),
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                      );
+                    }),
+                  ),
+                ),
               ),
               
               SizedBox(height: 16),
               
-              // Waveform visualization (simplified)
-              Container(
-                height: 60,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Color(0xFF2a2a2a),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Center(
-                  child: Icon(Icons.graphic_eq, color: Color(0xFF2196F3), size: 30),
-                ),
-              ),
-              
-              SizedBox(height: 20),
-              
-              // Vocal Range Result
               Text(
                 'YOUR VOCAL RANGE',
-                style: TextStyle(color: Colors.grey[400], fontSize: 12),
+                style: TextStyle(color: Colors.grey[600], fontSize: 12),
               ),
               SizedBox(height: 8),
               Text(
                 vocalRange,
                 style: TextStyle(
-                  fontSize: 24,
+                  fontSize: 28,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF2196F3),
                 ),
               ),
               
-              SizedBox(height: 20),
+              SizedBox(height: 16),
               
-              // Detailed results
               Container(
-                padding: EdgeInsets.all(16),
+                padding: EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Color(0xFF2a2a2a),
+                  color: Color(0xFFF5F5F5),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Column(
@@ -321,20 +427,55 @@ class _VocalRangeDetectorScreenState extends State<VocalRangeDetectorScreen>
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Lowest:', style: TextStyle(color: Colors.white70)),
-                        Text(lowestNote, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                        Text('Lowest:', style: TextStyle(color: Colors.grey[700], fontSize: 13)),
+                        Row(
+                          children: [
+                            Text(lowestNote, style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 13)),
+                            SizedBox(width: 8),
+                            GestureDetector(
+                              onTap: () => _playRecording(lowestRecordingPath),
+                              child: Icon(
+                                isPlayingBack ? Icons.stop : Icons.play_arrow,
+                                color: Color(0xFF2196F3),
+                                size: 20,
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
-                    SizedBox(height: 8),
+                    SizedBox(height: 6),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Highest:', style: TextStyle(color: Colors.white70)),
-                        Text(highestNote, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                        Text('Highest:', style: TextStyle(color: Colors.grey[700], fontSize: 13)),
+                        Row(
+                          children: [
+                            Text(highestNote, style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 13)),
+                            SizedBox(width: 8),
+                            GestureDetector(
+                              onTap: () => _playRecording(highestRecordingPath),
+                              child: Icon(
+                                isPlayingBack ? Icons.stop : Icons.play_arrow,
+                                color: Color(0xFF2196F3),
+                                size: 20,
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ],
                 ),
+              ),
+              
+              SizedBox(height: 12),
+              
+              // Playback instruction
+              Text(
+                'Tap play icons to hear your recordings',
+                style: TextStyle(color: Colors.grey[600], fontSize: 11),
+                textAlign: TextAlign.center,
               ),
             ],
           ),
@@ -349,7 +490,7 @@ class _VocalRangeDetectorScreenState extends State<VocalRangeDetectorScreen>
                     resetTest();
                   },
                   icon: Icon(Icons.refresh, color: Color(0xFF2196F3), size: 16),
-                  label: Text('Retake', style: TextStyle(color: Color(0xFF2196F3))),
+                  label: Text('Retake', style: TextStyle(color: Color(0xFF2196F3), fontSize: 14)),
                 ),
               ),
               SizedBox(width: 8),
@@ -363,7 +504,7 @@ class _VocalRangeDetectorScreenState extends State<VocalRangeDetectorScreen>
                     backgroundColor: Color(0xFF2196F3),
                     foregroundColor: Colors.white,
                   ),
-                  child: Text('Finish'),
+                  child: Text('Finish', style: TextStyle(fontSize: 14)),
                 ),
               ),
             ],
@@ -383,17 +524,19 @@ class _VocalRangeDetectorScreenState extends State<VocalRangeDetectorScreen>
       highestNote = '';
       highestFrequency = 0.0;
       vocalRange = '';
+      lowestRecordingPath = null;
+      highestRecordingPath = null;
     });
   }
 
   String getInstructionText() {
     switch (currentStep) {
       case 'start':
-        return 'Let\'s help you find your comfortable vocal range. Start by pressing "Run Test" when ready.';
+        return 'Let\'s help you find your comfortable vocal range. Your voice will be recorded for playback.';
       case 'lowest':
-        return 'Hum or sing your LOWEST comfortable note that you can comfortably sing by humming.';
+        return 'Hum or sing your LOWEST comfortable note.';
       case 'highest':
-        return 'Now hum or sing your HIGHEST comfortable note that you can comfortably sing by humming.';
+        return 'Now hum or sing your HIGHEST comfortable note.';
       default:
         return '';
     }
@@ -402,22 +545,11 @@ class _VocalRangeDetectorScreenState extends State<VocalRangeDetectorScreen>
   String getActivityTitle() {
     switch (currentStep) {
       case 'lowest':
-        return 'Activity:\nFind your LOWEST comfortable note that you can comfortably sing by humming.';
+        return 'Activity:\nFind your LOWEST comfortable note by humming.';
       case 'highest':
-        return 'Activity:\nFind your HIGHEST comfortable note that you can comfortably sing by humming.';
+        return 'Activity:\nFind your HIGHEST comfortable note by humming.';
       default:
-        return 'Activity:\nLet\'s discover your vocal range to determine the most suitable songs for you!';
-    }
-  }
-
-  String getStepInfo() {
-    switch (currentStep) {
-      case 'lowest':
-        return 'Let\'s help you find your comfortable vocal range. Start singing your lowest note by pressing "Run Test" when ready.';
-      case 'highest':
-        return 'Now let\'s find your highest comfortable note. Press the microphone when ready.';
-      default:
-        return 'We\'ll guide you through finding your vocal range step by step.';
+        return 'Activity:\nLet\'s discover your vocal range!';
     }
   }
 
@@ -425,7 +557,13 @@ class _VocalRangeDetectorScreenState extends State<VocalRangeDetectorScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Learning Course'),
+        title: Row(
+          children: [
+            Icon(Icons.music_note, color: Color(0xFF2196F3)),
+            SizedBox(width: 8),
+            Text('NOTECOACH'),
+          ],
+        ),
         centerTitle: true,
       ),
       body: Column(
@@ -443,7 +581,7 @@ class _VocalRangeDetectorScreenState extends State<VocalRangeDetectorScreen>
                 SizedBox(width: 12),
                 Text(
                   'Learning Course',
-                  style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -458,7 +596,7 @@ class _VocalRangeDetectorScreenState extends State<VocalRangeDetectorScreen>
                 Text(
                   getActivityTitle(),
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Colors.black,
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                     height: 1.4,
@@ -468,7 +606,7 @@ class _VocalRangeDetectorScreenState extends State<VocalRangeDetectorScreen>
                 Text(
                   'Humming/Singing',
                   style: TextStyle(
-                    color: Colors.white70,
+                    color: Colors.grey[600],
                     fontSize: 12,
                   ),
                 ),
@@ -478,13 +616,13 @@ class _VocalRangeDetectorScreenState extends State<VocalRangeDetectorScreen>
 
           SizedBox(height: 20),
 
-          // Waveform Visualization (exactly like report)
+          // Waveform Visualization
           if (isRecording)
             Container(
               margin: EdgeInsets.symmetric(horizontal: 20),
               height: 100,
               decoration: BoxDecoration(
-                color: Color(0xFF1a1a1a),
+                color: Color(0xFFF5F5F5),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Center(
@@ -506,7 +644,7 @@ class _VocalRangeDetectorScreenState extends State<VocalRangeDetectorScreen>
               ),
             ),
 
-          // Detected Note Display (shown at bottom as per report)
+          // Detected Note Display
           if (detectedNote.isNotEmpty)
             Container(
               padding: EdgeInsets.symmetric(vertical: 20),
@@ -514,7 +652,7 @@ class _VocalRangeDetectorScreenState extends State<VocalRangeDetectorScreen>
                 children: [
                   Text(
                     'Detected Note',
-                    style: TextStyle(color: Colors.grey[400], fontSize: 12),
+                    style: TextStyle(color: Colors.grey[600], fontSize: 12),
                   ),
                   SizedBox(height: 4),
                   Text(
@@ -527,7 +665,7 @@ class _VocalRangeDetectorScreenState extends State<VocalRangeDetectorScreen>
                   ),
                   Text(
                     '${detectedFrequency.toStringAsFixed(1)} Hz',
-                    style: TextStyle(color: Colors.grey[400], fontSize: 14),
+                    style: TextStyle(color: Colors.grey[600], fontSize: 14),
                   ),
                 ],
               ),
@@ -555,14 +693,14 @@ class _VocalRangeDetectorScreenState extends State<VocalRangeDetectorScreen>
                           height: isRecording ? 100 * pulseAnimation!.value : 100,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: isRecording ? Color(0xFF2196F3) : Color(0xFF1a1a1a),
+                            color: isRecording ? Color(0xFF2196F3) : Color(0xFFF5F5F5),
                             border: Border.all(
                               color: Color(0xFF2196F3),
                               width: 3,
                             ),
                           ),
                           child: Icon(
-                            Icons.mic,
+                            isRecording ? Icons.stop : Icons.mic,
                             color: isRecording ? Colors.white : Color(0xFF2196F3),
                             size: 50,
                           ),
@@ -577,41 +715,24 @@ class _VocalRangeDetectorScreenState extends State<VocalRangeDetectorScreen>
                         : isRecording 
                             ? 'Recording...' 
                             : 'Tap to Stop',
-                    style: TextStyle(color: Colors.white70, fontSize: 16),
+                    style: TextStyle(color: Colors.grey[600], fontSize: 16),
                   ),
                 ],
               ),
             ),
           ),
 
-          // Instruction Text (bottom, like report)
+          // Instruction Text
           Container(
             padding: EdgeInsets.all(20),
-            child: Column(
-              children: [
-                if (currentStep == 'start')
-                  Text(
-                    getInstructionText(),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.white70,
-                      height: 1.4,
-                    ),
-                  ),
-                if (currentStep != 'start')
-                  Text(
-                    currentStep == 'lowest' 
-                        ? 'Hold your lowest comfortable note for best results'
-                        : 'Hold your highest comfortable note for best results',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.white60,
-                      height: 1.4,
-                    ),
-                  ),
-              ],
+            child: Text(
+              getInstructionText(),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[700],
+                height: 1.4,
+              ),
             ),
           ),
         ],

@@ -1,6 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 <uses-permission android:name="android.permission.RECORD_AUDIO" />
 <uses-permission android:name="android.permission.MICROPHONE" />
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+<!-- Untuk Android 13+ -->
+<uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
     <application
         android:label="note_coach_new_2"
         android:name="${applicationName}"

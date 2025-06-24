@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:math';
 import 'dart:async';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:note_coach_new_2/pitch_lesson_step2.dart';
+import 'package:note_coach_new_2/pitch_lesson_step3.dart';
 
 void main() {
   runApp(NoteCoachApp());
@@ -604,20 +607,16 @@ class PitchLessonStep1 extends StatelessWidget {
     );
   }
 }
-
-// Pitch Lesson Step 2 - Listen to Different Pitches (White Theme)
-class PitchLessonStep2 extends StatefulWidget {
-  @override
-  _PitchLessonStep2State createState() => _PitchLessonStep2State();
-}
-
 class _PitchLessonStep2State extends State<PitchLessonStep2> {
+  // Audio player instance
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  
   // Audio files mapping
   final Map<String, String> audioTones = {
-    'A3': 'assets/audio/tones/A3_220Hz.mp3',
-    'C4': 'assets/audio/tones/C4_262Hz.mp3', 
-    'E4': 'assets/audio/tones/E4_330Hz.mp3',
-    'A4': 'assets/audio/tones/A4_440Hz.mp3',
+    'A3': 'audio/tones/A3_220Hz.mp3',  // Remove 'assets/' prefix for audioplayers
+    'C4': 'audio/tones/C4_262Hz.mp3', 
+    'E4': 'audio/tones/E4_330Hz.mp3',
+    'A4': 'audio/tones/A4_440Hz.mp3',
   };
   
   final Map<String, String> frequencies = {
@@ -628,6 +627,12 @@ class _PitchLessonStep2State extends State<PitchLessonStep2> {
   };
 
   String? currentlyPlaying;
+
+  @override
+  void dispose() {
+    _audioPlayer.dispose();
+    super.dispose();
+  }
   
   @override
   Widget build(BuildContext context) {
@@ -923,581 +928,49 @@ class _PitchLessonStep2State extends State<PitchLessonStep2> {
     );
   }
 
-  void _playTone(String note) {
-    setState(() {
+  Future<void> _playTone(String note) async {
+    try {
       if (currentlyPlaying == note) {
         // Stop current tone
-        currentlyPlaying = null;
-        _stopAudio();
-      } else {
-        // Play new tone
-        currentlyPlaying = note;
-        _playAudioFile(audioTones[note]!);
-      }
-    });
-  }
-
-  void _playAudioFile(String assetPath) {
-    // TODO: Implement audio playback with audioplayers package
-    print('Playing: $assetPath');
-    
-    // Auto-stop after 3 seconds (simulate tone duration)
-    Future.delayed(Duration(seconds: 3), () {
-      if (mounted) {
+        await _audioPlayer.stop();
         setState(() {
           currentlyPlaying = null;
         });
+      } else {
+        // Stop any currently playing audio
+        await _audioPlayer.stop();
+        
+        // Play new tone
+        setState(() {
+          currentlyPlaying = note;
+        });
+        
+        // Play audio from assets
+        await _audioPlayer.play(AssetSource(audioTones[note]!));
+        
+        // Listen for completion
+        _audioPlayer.onPlayerComplete.listen((_) {
+          if (mounted) {
+            setState(() {
+              currentlyPlaying = null;
+            });
+          }
+        });
       }
-    });
-  }
-
-  void _stopAudio() {
-    // TODO: Implement audio stop
-    print('Stopping audio');
-  }
-}
-
-// Pitch Lesson Step 3 - Practice Recognition
-class PitchLessonStep3 extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            Icon(Icons.music_note, color: Color(0xFF2196F3)),
-            SizedBox(width: 8),
-            Text('NOTECOACH'),
-          ],
+    } catch (e) {
+      print('Error playing audio: $e');
+      // If file not found, show message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Audio file not found: ${audioTones[note]}'),
+          backgroundColor: Colors.red,
         ),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Step Header with Progress
-            Container(
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Color(0xFF2196F3),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        'Pitch Lesson',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Spacer(),
-                      Container(
-                        padding: EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(Icons.lightbulb, color: Colors.white, size: 16),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Step 3 of 4',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            
-            SizedBox(height: 16),
-            
-            // Progress Bar
-            Container(
-              height: 6,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(3),
-              ),
-              child: FractionallySizedBox(
-                alignment: Alignment.centerLeft,
-                widthFactor: 0.75, // 75% progress (step 3 of 4)
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Color(0xFF2196F3),
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                ),
-              ),
-            ),
-            
-            SizedBox(height: 32),
-            
-            // Title
-            Text(
-              'Understanding Pitch Recognition',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            
-            SizedBox(height: 16),
-            
-            Text(
-              'Now that you\'ve heard different pitches, let\'s understand how our ears and voice work together to recognize and match pitch.',
-              style: TextStyle(
-                color: Colors.grey[700],
-                fontSize: 14,
-                height: 1.5,
-              ),
-            ),
-            
-            SizedBox(height: 24),
-            
-            // Key Concepts
-            Container(
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Color(0xFFF5F5F5),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Key Concepts:',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  _buildConceptItem(
-                    '🎵',
-                    'Pitch Matching',
-                    'Your goal is to match the pitch you hear with your voice',
-                  ),
-                  _buildConceptItem(
-                    '👂',
-                    'Active Listening',
-                    'Train your ear to recognize subtle pitch differences',
-                  ),
-                  _buildConceptItem(
-                    '🎯',
-                    'Practice Makes Perfect',
-                    'Regular practice improves your pitch accuracy over time',
-                  ),
-                ],
-              ),
-            ),
-            
-            SizedBox(height: 24),
-            
-            // Tips Section
-            Container(
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Color(0xFFF5F5F5),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.tips_and_updates, color: Color(0xFF2196F3), size: 20),
-                      SizedBox(width: 8),
-                      Text(
-                        'Pro Tips for Pitch Training:',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 12),
-                  Text(
-                    '• Start with humming - it\'s easier than singing words\n'
-                    '• Focus on one pitch at a time\n'
-                    '• Practice regularly, even just 5 minutes daily\n'
-                    '• Don\'t worry about being perfect immediately',
-                    style: TextStyle(
-                      color: Colors.grey[700],
-                      fontSize: 13,
-                      height: 1.4,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            
-            SizedBox(height: 24),
-            
-            // Ready for Test Section
-            Container(
-              padding: EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Color(0xFF2196F3).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Color(0xFF2196F3).withOpacity(0.3)),
-              ),
-              child: Column(
-                children: [
-                  Icon(Icons.psychology, color: Color(0xFF2196F3), size: 40),
-                  SizedBox(height: 12),
-                  Text(
-                    'Ready for Your First Test?',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Next, we\'ll help you discover your unique vocal range!',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.grey[700],
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            
-            SizedBox(height: 32),
-            
-            // Navigation Buttons
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => Navigator.pop(context),
-                    icon: Icon(Icons.arrow_back, color: Colors.grey[700], size: 16),
-                    label: Text('Previous', style: TextStyle(color: Colors.grey[700])),
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Colors.grey[400]!),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => PitchLessonStep4()),
-                    ),
-                    icon: Icon(Icons.arrow_forward, color: Colors.white, size: 16),
-                    label: Text('Next', style: TextStyle(color: Colors.white)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF2196F3),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildConceptItem(String emoji, String title, String description) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 16),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(emoji, style: TextStyle(fontSize: 20)),
-          SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  description,
-                  style: TextStyle(
-                    color: Colors.grey[700],
-                    fontSize: 13,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// Pitch Lesson Step 4 - Ready for Vocal Range Test
-class PitchLessonStep4 extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            Icon(Icons.music_note, color: Color(0xFF2196F3)),
-            SizedBox(width: 8),
-            Text('NOTECOACH'),
-          ],
-        ),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Step Header with Progress
-            Container(
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Color(0xFF2196F3),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        'Pitch Lesson',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Spacer(),
-                      Container(
-                        padding: EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(Icons.check_circle, color: Colors.white, size: 16),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Step 4 of 4 - Complete!',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            
-            SizedBox(height: 16),
-            
-            // Progress Bar (100%)
-            Container(
-              height: 6,
-              decoration: BoxDecoration(
-                color: Color(0xFF2196F3),
-                borderRadius: BorderRadius.circular(3),
-              ),
-            ),
-            
-            SizedBox(height: 32),
-            
-            // Completion Message
-            Center(
-              child: Column(
-                children: [
-                  Icon(
-                    Icons.celebration,
-                    color: Color(0xFF4CAF50),
-                    size: 60,
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Congratulations!',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'You\'ve completed the Pitch Lesson',
-                    style: TextStyle(
-                      color: Colors.grey[700],
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            
-            SizedBox(height: 32),
-            
-            // What You Learned
-            Container(
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Color(0xFFF5F5F5),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'What You\'ve Learned:',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 12),
-                  _buildLearningPoint('✓ Understanding what pitch is'),
-                  _buildLearningPoint('✓ Hearing different pitch levels'),
-                  _buildLearningPoint('✓ Pitch recognition techniques'),
-                  _buildLearningPoint('✓ Ready for vocal range testing'),
-                ],
-              ),
-            ),
-            
-            SizedBox(height: 24),
-            
-            // Next Step
-            Container(
-              padding: EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Color(0xFF4CAF50).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Color(0xFF4CAF50).withOpacity(0.3)),
-              ),
-              child: Column(
-                children: [
-                  Icon(Icons.mic, color: Color(0xFF4CAF50), size: 40),
-                  SizedBox(height: 12),
-                  Text(
-                    'Ready for Vocal Range Test?',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Now that you understand pitch, let\'s discover your unique vocal range!',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.grey[700],
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            
-            SizedBox(height: 32),
-            
-            // Navigation Buttons
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => Navigator.pop(context),
-                    icon: Icon(Icons.arrow_back, color: Colors.grey[700], size: 16),
-                    label: Text('Previous', style: TextStyle(color: Colors.grey[700])),
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Colors.grey[400]!),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      // Navigate to Vocal Range Test
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => VocalRangeIntroScreen()),
-                      );
-                    },
-                    icon: Icon(Icons.mic, color: Colors.white, size: 16),
-                    label: Text('Test Vocal Range', style: TextStyle(color: Colors.white)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF4CAF50),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLearningPoint(String text) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 8),
-      child: Row(
-        children: [
-          SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              text,
-              style: TextStyle(color: Colors.grey[700], fontSize: 13),
-            ),
-          ),
-        ],
-      ),
-    );
+      );
+      
+      setState(() {
+        currentlyPlaying = null;
+      });
+    }
   }
 }
 
