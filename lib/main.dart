@@ -1283,7 +1283,7 @@ class VocalRangeIntroScreen extends StatelessWidget {
                   // Navigate to VocalRangeDetectorScreen
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => EnhancedVocalRangeDetector()),
+                    MaterialPageRoute(builder: (context) => ImprovedVocalRangeDetector()),
                   );
                 },
                 style: ElevatedButton.styleFrom(
