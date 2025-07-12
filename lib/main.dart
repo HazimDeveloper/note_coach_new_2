@@ -1,4 +1,4 @@
-// lib/main.dart - Updated to use Real-Time Voice Detection
+// lib/main.dart - Complete NoteCoach Application with Singing Practice
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:math';
@@ -6,7 +6,8 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:note_coach_new_2/pitch_lesson_step2.dart';
 import 'package:note_coach_new_2/pitch_lesson_step3.dart';
-import 'package:note_coach_new_2/realtime_voice_detector.dart'; // Import new detector
+import 'package:note_coach_new_2/vocal_range_detector_screen.dart';
+import 'package:note_coach_new_2/singing_practice_screens.dart'; // Import singing practice
 
 void main() {
   runApp(NoteCoachApp());
@@ -58,6 +59,7 @@ class _MainScreenState extends State<MainScreen> {
   final List<Widget> _screens = [
     HomeScreen(),
     LearningScreen(),
+    SingScreen(), // New singing screen
   ];
 
   @override
@@ -85,13 +87,379 @@ class _MainScreenState extends State<MainScreen> {
             icon: Icon(Icons.school),
             label: 'Learn',
           ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.mic),
+            label: 'Sing',
+          ),
         ],
       ),
     );
   }
 }
 
-// Updated Home Screen with Real-Time Voice Detection
+// New Sing Screen - Main singing hub
+class SingScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Row(
+          children: [
+            Icon(Icons.music_note, color: Color(0xFF2196F3)),
+            SizedBox(width: 8),
+            Text('NOTECOACH'),
+          ],
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Welcome Section
+            Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFF2196F3).withOpacity(0.1), Colors.white],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Color(0xFF2196F3).withOpacity(0.2)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Color(0xFF2196F3),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(Icons.mic, color: Colors.white, size: 24),
+                      ),
+                      SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Practice Singing',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              'Real-time pitch feedback & accuracy tracking',
+                              style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Choose from our curated song collection and practice with professional-grade pitch detection technology.',
+                    style: TextStyle(
+                      color: Colors.grey[700],
+                      fontSize: 14,
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            SizedBox(height: 24),
+            
+            // Quick Actions
+            Text(
+              'Quick Actions',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 16),
+            
+            // Song Practice Button
+            _buildActionCard(
+              context,
+              'Song Practice',
+              'Practice with popular songs',
+              'Real-time feedback & accuracy scoring',
+              Icons.library_music,
+              Color(0xFF4CAF50),
+              () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SongSelectionScreen()),
+              ),
+            ),
+            
+            SizedBox(height: 12),
+            
+            // Free Practice Button
+            _buildActionCard(
+              context,
+              'Free Practice',
+              'Practice any melody you like',
+              'Open pitch detection mode',
+              Icons.keyboard_voice,
+              Color(0xFFFF9800),
+              () => _showComingSoonDialog(context, 'Free Practice'),
+            ),
+            
+            SizedBox(height: 12),
+            
+            // Vocal Warm-up Button
+            _buildActionCard(
+              context,
+              'Vocal Warm-up',
+              'Prepare your voice for singing',
+              'Guided vocal exercises',
+              Icons.self_improvement,
+              Color(0xFF9C27B0),
+              () => _showComingSoonDialog(context, 'Vocal Warm-up'),
+            ),
+            
+            SizedBox(height: 24),
+            
+            // Featured Songs Preview
+            Text(
+              'Featured Songs',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 16),
+            
+            // Song Cards
+            Container(
+              height: 200,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: SongDatabase.getSongs().map((song) {
+                  final voiceColor = SongDatabase.getVoiceTypeColor(song.voiceType);
+                  return Container(
+                    width: 160,
+                    margin: EdgeInsets.only(right: 12),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [voiceColor.withOpacity(0.1), Colors.white],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: voiceColor.withOpacity(0.3)),
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(16),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(16),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SongPreviewScreen(song: song),
+                            ),
+                          );
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 60,
+                                height: 60,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [voiceColor, voiceColor.withOpacity(0.7)],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Icon(Icons.music_note, color: Colors.white, size: 28),
+                              ),
+                              SizedBox(height: 16),
+                              Text(
+                                song.title,
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                song.artist,
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: 12,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              SizedBox(height: 8),
+                              Container(
+                                padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: voiceColor.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: voiceColor.withOpacity(0.3)),
+                                ),
+                                child: Text(
+                                  song.voiceType,
+                                  style: TextStyle(
+                                    color: voiceColor,
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+            
+            SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionCard(
+    BuildContext context,
+    String title,
+    String subtitle,
+    String description,
+    IconData icon,
+    Color color,
+    VoidCallback onTap,
+  ) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: onTap,
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [color, color.withOpacity(0.8)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(icon, color: Colors.white, size: 28),
+                ),
+                SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        description,
+                        style: TextStyle(
+                          color: Colors.grey[500],
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(Icons.arrow_forward_ios, color: Colors.grey[400], size: 16),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showComingSoonDialog(BuildContext context, String feature) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            Icon(Icons.construction, color: Color(0xFF2196F3)),
+            SizedBox(width: 8),
+            Text('Coming Soon'),
+          ],
+        ),
+        content: Text('$feature feature is currently under development and will be available in a future update.'),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context),
+            style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF2196F3)),
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Original Home Screen - White Theme (kept as is)
 class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -213,99 +581,6 @@ class HomeScreen extends StatelessWidget {
             
             SizedBox(height: 24),
             
-            // Quick Voice Test Section - NEW
-            Text(
-              'Quick Voice Analysis',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 12),
-            
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => RealTimeVoiceDetector()),
-                );
-              },
-              child: Container(
-                padding: EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Color(0xFF2196F3).withOpacity(0.1),
-                      Color(0xFF2196F3).withOpacity(0.05),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Color(0xFF2196F3).withOpacity(0.3)),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [Color(0xFF2196F3), Color(0xFF1976D2)],
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(Icons.graphic_eq, color: Colors.white, size: 24),
-                    ),
-                    SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Real-Time Voice Detection',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            'Instant note detection • Precise frequency analysis',
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: 12,
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          Container(
-                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Color(0xFF4CAF50),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              'NEW',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Icon(Icons.arrow_forward_ios, color: Color(0xFF2196F3)),
-                  ],
-                ),
-              ),
-            ),
-            
-            SizedBox(height: 24),
-            
             // Browse Section
             Text(
               'Browse Version',
@@ -322,15 +597,25 @@ class HomeScreen extends StatelessWidget {
               children: [
                 Expanded(
                   child: _buildBrowseCard(
-                    'VOCAL WARM UP',
-                    'Voice Resonance',
+                    context,
+                    'SONG PRACTICE',
+                    'Practice with real songs',
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => SongSelectionScreen()),
+                    ),
                   ),
                 ),
                 SizedBox(width: 12),
                 Expanded(
                   child: _buildBrowseCard(
-                    'BREATHING CONTROL',
-                    'Learn and master your voice',
+                    context,
+                    'VOCAL RANGE',
+                    'Test your vocal range',
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ImprovedVocalRangeDetector()),
+                    ),
                   ),
                 ),
               ],
@@ -368,59 +653,62 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBrowseCard(String title, String subtitle) {
-    return Container(
-      height: 120,
-      decoration: BoxDecoration(
-        color: Color(0xFFF5F5F5),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            height: 60,
-            decoration: BoxDecoration(
-              color: Color(0xFFE0E0E0),
-              borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+  Widget _buildBrowseCard(BuildContext context, String title, String subtitle, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 120,
+        decoration: BoxDecoration(
+          color: Color(0xFFF5F5F5),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 60,
+              decoration: BoxDecoration(
+                color: Color(0xFFE0E0E0),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+              ),
+              child: Center(
+                child: Icon(Icons.music_note, color: Color(0xFF2196F3), size: 30),
+              ),
             ),
-            child: Center(
-              child: Icon(Icons.music_note, color: Color(0xFF2196F3), size: 30),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
+            Padding(
+              padding: EdgeInsets.all(8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                SizedBox(height: 2),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 9,
+                  SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 9,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
 
-// Updated Learning Screen
+// Learning Screen - List of lessons with White Theme (kept as is)
 class LearningScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -432,28 +720,11 @@ class LearningScreen extends StatelessWidget {
       body: ListView(
         padding: EdgeInsets.all(16),
         children: [
-          // Real-Time Voice Detection Card - NEW
-          _buildLearningCard(
-            context,
-            'Real-Time Voice Detection',
-            'Instant note detection and voice classification',
-            Icons.graphic_eq,
-            Color(0xFF4CAF50),
-            () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => RealTimeVoiceDetector()),
-            ),
-            isNew: true,
-          ),
-          
-          SizedBox(height: 16),
-          
-          // Existing Pitching Course
           _buildLearningCard(
             context,
             'Pitching',
             'Learn about pitch and frequency',
-            Icons.music_note,
+            Icons.graphic_eq,
             Color(0xFF2196F3),
             () => Navigator.push(
               context,
@@ -466,41 +737,17 @@ class LearningScreen extends StatelessWidget {
   }
 
   Widget _buildLearningCard(BuildContext context, String title, String subtitle, 
-      IconData icon, Color color, VoidCallback onTap, {bool isNew = false}) {
+      IconData icon, Color color, VoidCallback onTap) {
     return Card(
       color: Color(0xFFF5F5F5),
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
         contentPadding: EdgeInsets.all(16),
-        leading: Stack(
-          children: [
-            CircleAvatar(
-              backgroundColor: color,
-              radius: 25,
-              child: Icon(icon, color: Colors.white, size: 25),
-            ),
-            if (isNew)
-              Positioned(
-                right: 0,
-                top: 0,
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    'NEW',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 8,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-          ],
+        leading: CircleAvatar(
+          backgroundColor: color,
+          radius: 25,
+          child: Icon(icon, color: Colors.white, size: 25),
         ),
         title: Text(
           title,
@@ -521,7 +768,7 @@ class LearningScreen extends StatelessWidget {
   }
 }
 
-// Existing Pitch Lesson Step 1 (unchanged)
+// Keep all the existing lesson classes as they were
 class PitchLessonStep1 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -625,60 +872,6 @@ class PitchLessonStep1 extends StatelessWidget {
                 color: Colors.grey[700],
                 fontSize: 14,
                 height: 1.5,
-              ),
-            ),
-            
-            SizedBox(height: 24),
-            
-            // Quick Start Option - NEW
-            Container(
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Color(0xFF4CAF50).withOpacity(0.1),
-                    Color(0xFF4CAF50).withOpacity(0.05),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Color(0xFF4CAF50).withOpacity(0.3)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.flash_on, color: Color(0xFF4CAF50), size: 20),
-                      SizedBox(width: 8),
-                      Text(
-                        'Quick Start Option',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Skip the theory and try our real-time voice detector now!',
-                    style: TextStyle(color: Colors.grey[700], fontSize: 14),
-                  ),
-                  SizedBox(height: 12),
-                  ElevatedButton.icon(
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => RealTimeVoiceDetector()),
-                    ),
-                    icon: Icon(Icons.mic, color: Colors.white, size: 16),
-                    label: Text('Try Voice Detector', style: TextStyle(color: Colors.white)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF4CAF50),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                    ),
-                  ),
-                ],
               ),
             ),
             
