@@ -7,8 +7,8 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:note_coach_new_2/pitch_lesson_step2.dart';
 import 'package:note_coach_new_2/pitch_lesson_step3.dart';
 import 'package:note_coach_new_2/singing_practice_screen.dart';
+import 'package:note_coach_new_2/singing_practice_screens.dart';
 import 'package:note_coach_new_2/vocal_range_detector_screen.dart';
-import 'package:note_coach_new_2/singing_practice_screens.dart'; // Import singing practice
 
 void main() {
   runApp(NoteCoachApp());
@@ -249,8 +249,8 @@ class SingScreen extends StatelessWidget {
               height: 200,
               child: ListView(
                 scrollDirection: Axis.horizontal,
-                children: EnhancedSongDatabase.getSongs().map((song) {
-                  final voiceColor = EnhancedSongDatabase.getVoiceTypeColor(song.voiceType);
+                children: SimpleSongDatabase.getSongs().map((song) {
+                  final voiceColor = SimpleSongDatabase.getVoiceTypeColor(song.voiceType);
                   return Container(
                     width: 160,
                     margin: EdgeInsets.only(right: 12),
@@ -596,17 +596,17 @@ class HomeScreen extends StatelessWidget {
             // Browse Cards
             Row(
               children: [
-                Expanded(
-                  child: _buildBrowseCard(
-                    context,
-                    'SONG PRACTICE',
-                    'Practice with real songs',
-                    () => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => UpdatedSongSelectionScreen()),
-                    ),
-                  ),
-                ),
+                // Expanded(
+                //   child: _buildBrowseCard(
+                //     context,
+                //     'SONG PRACTICE',
+                //     'Practice with real songs',
+                //     () => Navigator.push(
+                //       context,
+                //       MaterialPageRoute(builder: (context) => UpdatedSongSelectionScreen()),
+                //     ),
+                //   ),
+                // ),
                 SizedBox(width: 12),
                 Expanded(
                   child: _buildBrowseCard(
