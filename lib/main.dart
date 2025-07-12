@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:note_coach_new_2/pitch_lesson_step2.dart';
 import 'package:note_coach_new_2/pitch_lesson_step3.dart';
+import 'package:note_coach_new_2/singing_practice_screen.dart';
 import 'package:note_coach_new_2/vocal_range_detector_screen.dart';
 import 'package:note_coach_new_2/singing_practice_screens.dart'; // Import singing practice
 
@@ -200,7 +201,7 @@ class SingScreen extends StatelessWidget {
               Color(0xFF4CAF50),
               () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => SongSelectionScreen()),
+                MaterialPageRoute(builder: (context) => UpdatedSongSelectionScreen()),
               ),
             ),
             
@@ -248,8 +249,8 @@ class SingScreen extends StatelessWidget {
               height: 200,
               child: ListView(
                 scrollDirection: Axis.horizontal,
-                children: SongDatabase.getSongs().map((song) {
-                  final voiceColor = SongDatabase.getVoiceTypeColor(song.voiceType);
+                children: EnhancedSongDatabase.getSongs().map((song) {
+                  final voiceColor = EnhancedSongDatabase.getVoiceTypeColor(song.voiceType);
                   return Container(
                     width: 160,
                     margin: EdgeInsets.only(right: 12),
@@ -271,7 +272,7 @@ class SingScreen extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => SongPreviewScreen(song: song),
+                              builder: (context) => EnhancedSongPreviewScreen(song: song),
                             ),
                           );
                         },
@@ -602,7 +603,7 @@ class HomeScreen extends StatelessWidget {
                     'Practice with real songs',
                     () => Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => SongSelectionScreen()),
+                      MaterialPageRoute(builder: (context) => UpdatedSongSelectionScreen()),
                     ),
                   ),
                 ),

@@ -1,133 +1,13 @@
-// lib/singing_practice_screens.dart
+// lib/updated_singing_practice_screens.dart
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:note_coach_new_2/singing_practice_screen.dart';
-import 'package:record/record.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'dart:math';
-import 'dart:async';
 
-// Song Data Model with actual accompaniment files
-class Note {
-  final String note;
-  final String lyric;
-  final double frequency;
-
-  Note({required this.note, required this.lyric, required this.frequency});
-}
-
-class SongData {
-  final String title;
-  final String artist;
-  final String voiceType;
-  final String lyrics;
-  final String accompanimentPath; // Path to actual MP3 file
-  final Duration estimatedDuration;
-  final List<Note> notes;
-
-  SongData({
-    required this.title,
-    required this.artist,
-    required this.voiceType,
-    required this.lyrics,
-    required this.accompanimentPath,
-    required this.notes,
-    this.estimatedDuration = const Duration(minutes: 3),
-  });
-}
-
-// Song Database with actual accompaniment files
-class SongDatabase {
-  static List<SongData> getSongs() {
-    return [
-      // AMIR JAHARI – HASRAT (BARITONE)
-      SongData(
-        title: "Hasrat",
-        artist: "Amir Jahari",
-        voiceType: "BARITONE",
-        lyrics: "Teriaklah sekuat mana pun aku suara ini tidak mendengar...",
-        accompanimentPath: "song/AMIR JAHARI - HASRAT (OST IMAGINUR) - BARITONE-Accompaniment.mp3",
-        notes: [
-          Note(note: "C3", lyric: "Te", frequency: 130.81),
-          Note(note: "D3", lyric: "ri", frequency: 146.83),
-          Note(note: "E3", lyric: "ak", frequency: 164.81),
-          Note(note: "F3", lyric: "lah", frequency: 174.61),
-        ],
-        estimatedDuration: Duration(minutes: 3, seconds: 30),
-      ),
-
-      // ANDMESH KAMALENG – CINTA LUAR BIASA (TENOR MALE)
-      SongData(
-        title: "Cinta Luar Biasa",
-        artist: "Andmesh Kamaleng",
-        voiceType: "TENOR MALE",
-        lyrics: "Rasa ini tak tertahan hati ini selalu untukmu...",
-        accompanimentPath: "song/Andmesh - Cinta Luar Biasa - TENOR MALE-Accompaniment.mp3",
-        notes: [
-          Note(note: "G3", lyric: "Ra", frequency: 196.00),
-          Note(note: "A3", lyric: "sa", frequency: 220.00),
-          Note(note: "B3", lyric: "in", frequency: 246.94),
-          Note(note: "C4", lyric: "i", frequency: 261.63),
-        ],
-        estimatedDuration: Duration(minutes: 4, seconds: 15),
-      ),
-
-      // DATO' SITI NURHALIZA – BUKAN CINTA BIASA (TENOR FEMALE)
-      SongData(
-        title: "Bukan Cinta Biasa",
-        artist: "Dato' Siti Nurhaliza",
-        voiceType: "TENOR FEMALE",
-        lyrics: "Mengapa mereka selalu bertanya cinta ku bukan di atas kertas...",
-        accompanimentPath: "song/Dato' Siti Nurhaliza - Bukan Cinta Biasa - TENOR FEMALE-Accompaniment.mp3",
-        notes: [
-          Note(note: "D4", lyric: "Me", frequency: 293.66),
-          Note(note: "E4", lyric: "nga", frequency: 329.63),
-          Note(note: "F4", lyric: "pa", frequency: 349.23),
-          Note(note: "G4", lyric: "me", frequency: 392.00),
-        ],
-        estimatedDuration: Duration(minutes: 3, seconds: 45),
-      ),
-
-      // AINA ABDUL – JANGAN MATI RASA ITU (ALTO)
-      SongData(
-        title: "Jangan Mati Rasa Itu",
-        artist: "Aina Abdul",
-        voiceType: "ALTO",
-        lyrics: "Kasihmu terus hidup jangan mati rasa itu...",
-        accompanimentPath: "song/Aina Abdul - Jangan Mati Rasa Itu - ALTO-Accompaniment.mp3",
-        notes: [
-          Note(note: "A3", lyric: "Ka", frequency: 220.00),
-          Note(note: "B3", lyric: "sih", frequency: 246.94),
-          Note(note: "C4", lyric: "mu", frequency: 261.63),
-          Note(note: "D4", lyric: "te", frequency: 293.66),
-        ],
-        estimatedDuration: Duration(minutes: 3, seconds: 20),
-      ),
-    ];
-  }
-
-  static Color getVoiceTypeColor(String voiceType) {
-    switch (voiceType.toUpperCase()) {
-      case 'BARITONE':
-        return Color(0xFF4169E1); // Royal Blue
-      case 'TENOR MALE':
-      case 'TENOR':
-        return Color(0xFF32CD32); // Lime Green
-      case 'TENOR FEMALE':
-        return Color(0xFF20B2AA); // Light Sea Green
-      case 'ALTO':
-        return Color(0xFFFF6347); // Tomato
-      default:
-        return Color(0xFF2196F3); // Default Blue
-    }
-  }
-}
-
-// Song Selection Screen
-class SongSelectionScreen extends StatelessWidget {
+// Updated Song Selection Screen with Enhanced Karaoke Integration
+class UpdatedSongSelectionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final songs = SongDatabase.getSongs();
+    final songs = EnhancedSongDatabase.getSongs();
 
     return Scaffold(
       appBar: AppBar(
@@ -142,7 +22,7 @@ class SongSelectionScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          // Header Section
+          // Enhanced Header Section
           Container(
             padding: EdgeInsets.all(20),
             decoration: BoxDecoration(
@@ -160,10 +40,12 @@ class SongSelectionScreen extends StatelessWidget {
                     Container(
                       padding: EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Color(0xFF2196F3),
+                        gradient: LinearGradient(
+                          colors: [Color(0xFF2196F3), Color(0xFF1976D2)],
+                        ),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Icon(Icons.library_music, color: Colors.white, size: 24),
+                      child: Icon(Icons.queue_music, color: Colors.white, size: 24),
                     ),
                     SizedBox(width: 16),
                     Expanded(
@@ -171,7 +53,7 @@ class SongSelectionScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Select Song',
+                            'Karaoke Practice',
                             style: TextStyle(
                               color: Colors.black,
                               fontSize: 18,
@@ -179,7 +61,7 @@ class SongSelectionScreen extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            'Choose a song and practice singing',
+                            'Sing along with full songs • Real-time analysis',
                             style: TextStyle(color: Colors.grey[600], fontSize: 14),
                           ),
                         ],
@@ -203,7 +85,7 @@ class SongSelectionScreen extends StatelessWidget {
                           Icon(Icons.music_note, color: Color(0xFF4CAF50), size: 16),
                           SizedBox(width: 4),
                           Text(
-                            '${songs.length} Songs Available',
+                            '${songs.length} Full Songs',
                             style: TextStyle(
                               color: Color(0xFF4CAF50),
                               fontSize: 12,
@@ -222,9 +104,26 @@ class SongSelectionScreen extends StatelessWidget {
                         border: Border.all(color: Color(0xFF2196F3).withOpacity(0.3)),
                       ),
                       child: Text(
-                        'Real-time Feedback',
+                        'Karaoke Mode',
                         style: TextStyle(
                           color: Color(0xFF2196F3),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Color(0xFFFF9800).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Color(0xFFFF9800).withOpacity(0.3)),
+                      ),
+                      child: Text(
+                        'Full Analysis',
+                        style: TextStyle(
+                          color: Color(0xFFFF9800),
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
@@ -236,14 +135,39 @@ class SongSelectionScreen extends StatelessWidget {
             ),
           ),
 
+          // Featured Song Section
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            child: Row(
+              children: [
+                Text(
+                  'Featured Songs',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                Spacer(),
+                Text(
+                  'Swipe for more →',
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
           // Songs List
           Expanded(
             child: ListView.builder(
-              padding: EdgeInsets.all(16),
+              padding: EdgeInsets.symmetric(horizontal: 16),
               itemCount: songs.length,
               itemBuilder: (context, index) {
                 final song = songs[index];
-                final voiceColor = SongDatabase.getVoiceTypeColor(song.voiceType);
+                final voiceColor = EnhancedSongDatabase.getVoiceTypeColor(song.voiceType);
 
                 return Container(
                   margin: EdgeInsets.only(bottom: 12),
@@ -267,7 +191,7 @@ class SongSelectionScreen extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => SongPreviewScreen(song: song),
+                            builder: (context) => EnhancedSongPreviewScreen(song: song),
                           ),
                         );
                       },
@@ -275,10 +199,10 @@ class SongSelectionScreen extends StatelessWidget {
                         padding: EdgeInsets.all(16),
                         child: Row(
                           children: [
-                            // Album Art Placeholder
+                            // Enhanced Album Art
                             Container(
-                              width: 60,
-                              height: 60,
+                              width: 70,
+                              height: 70,
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
                                   colors: [voiceColor, voiceColor.withOpacity(0.7)],
@@ -286,16 +210,45 @@ class SongSelectionScreen extends StatelessWidget {
                                   end: Alignment.bottomRight,
                                 ),
                                 borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: voiceColor.withOpacity(0.3),
+                                    blurRadius: 8,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
                               ),
-                              child: Icon(
-                                Icons.music_note,
-                                color: Colors.white,
-                                size: 28,
+                              child: Stack(
+                                children: [
+                                  Center(
+                                    child: Icon(
+                                      Icons.music_note,
+                                      color: Colors.white,
+                                      size: 32,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    bottom: 4,
+                                    right: 4,
+                                    child: Container(
+                                      padding: EdgeInsets.all(4),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(
+                                        Icons.queue_music,
+                                        color: voiceColor,
+                                        size: 12,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                             SizedBox(width: 16),
                             
-                            // Song Info
+                            // Enhanced Song Info
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -330,7 +283,7 @@ class SongSelectionScreen extends StatelessWidget {
                                           song.voiceType,
                                           style: TextStyle(
                                             color: voiceColor,
-                                            fontSize: 11,
+                                            fontSize: 10,
                                             fontWeight: FontWeight.w600,
                                           ),
                                         ),
@@ -343,10 +296,26 @@ class SongSelectionScreen extends StatelessWidget {
                                           borderRadius: BorderRadius.circular(12),
                                         ),
                                         child: Text(
-                                          '${song.estimatedDuration.inMinutes}:${(song.estimatedDuration.inSeconds % 60).toString().padLeft(2, '0')}',
+                                          '${song.duration.inMinutes}:${(song.duration.inSeconds % 60).toString().padLeft(2, '0')}',
                                           style: TextStyle(
                                             color: Colors.grey[600],
-                                            fontSize: 11,
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: 8),
+                                      Container(
+                                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: Color(0xFF4CAF50).withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: Text(
+                                          '${song.lyricSegments.length} parts',
+                                          style: TextStyle(
+                                            color: Color(0xFF4CAF50),
+                                            fontSize: 10,
                                             fontWeight: FontWeight.w500,
                                           ),
                                         ),
@@ -357,12 +326,15 @@ class SongSelectionScreen extends StatelessWidget {
                               ),
                             ),
                             
-                            // Play Icon
+                            // Enhanced Play Icon
                             Container(
-                              padding: EdgeInsets.all(8),
+                              padding: EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: voiceColor.withOpacity(0.1),
+                                gradient: LinearGradient(
+                                  colors: [voiceColor.withOpacity(0.2), voiceColor.withOpacity(0.1)],
+                                ),
                                 shape: BoxShape.circle,
+                                border: Border.all(color: voiceColor.withOpacity(0.3)),
                               ),
                               child: Icon(
                                 Icons.play_arrow,
@@ -385,24 +357,94 @@ class SongSelectionScreen extends StatelessWidget {
   }
 }
 
-// Song Preview Screen
-class SongPreviewScreen extends StatelessWidget {
-  final SongData song;
+// Enhanced Song Preview Screen
+class EnhancedSongPreviewScreen extends StatefulWidget {
+  final EnhancedSongData song;
 
-  const SongPreviewScreen({Key? key, required this.song}) : super(key: key);
+  const EnhancedSongPreviewScreen({Key? key, required this.song}) : super(key: key);
+
+  @override
+  _EnhancedSongPreviewScreenState createState() => _EnhancedSongPreviewScreenState();
+}
+
+class _EnhancedSongPreviewScreenState extends State<EnhancedSongPreviewScreen> {
+  final AudioPlayer _player = AudioPlayer();
+  bool isPlaying = false;
+  Duration currentPosition = Duration.zero;
+  Duration totalDuration = Duration.zero;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeAudio();
+  }
+
+  @override
+  void dispose() {
+    _player.dispose();
+    super.dispose();
+  }
+
+  void _initializeAudio() {
+    _player.onPositionChanged.listen((position) {
+      setState(() {
+        currentPosition = position;
+      });
+    });
+
+    _player.onDurationChanged.listen((duration) {
+      setState(() {
+        totalDuration = duration;
+      });
+    });
+
+    _player.onPlayerComplete.listen((_) {
+      setState(() {
+        isPlaying = false;
+        currentPosition = Duration.zero;
+      });
+    });
+  }
+
+  Future<void> _togglePreview() async {
+    try {
+      if (isPlaying) {
+        await _player.stop();
+        setState(() {
+          isPlaying = false;
+          currentPosition = Duration.zero;
+        });
+      } else {
+        await _player.play(AssetSource(widget.song.accompanimentPath));
+        setState(() {
+          isPlaying = true;
+        });
+      }
+    } catch (e) {
+      print('Error playing preview: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Preview not available'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final voiceColor = SongDatabase.getVoiceTypeColor(song.voiceType);
+    final voiceColor = EnhancedSongDatabase.getVoiceTypeColor(widget.song.voiceType);
 
     return Scaffold(
       appBar: AppBar(
         title: Text('Song Preview'),
         centerTitle: true,
+        backgroundColor: Colors.white,
+        elevation: 0,
       ),
       body: Column(
         children: [
-          // Song Header
+          // Enhanced Song Header
           Container(
             padding: EdgeInsets.all(24),
             decoration: BoxDecoration(
@@ -414,36 +456,61 @@ class SongPreviewScreen extends StatelessWidget {
             ),
             child: Column(
               children: [
-                // Album Art
-                Container(
-                  width: 120,
-                  height: 120,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [voiceColor, voiceColor.withOpacity(0.7)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: voiceColor.withOpacity(0.3),
-                        blurRadius: 20,
-                        offset: Offset(0, 8),
+                // Enhanced Album Art with Animation
+                Hero(
+                  tag: 'song_${widget.song.title}',
+                  child: Container(
+                    width: 140,
+                    height: 140,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [voiceColor, voiceColor.withOpacity(0.7)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
-                    ],
-                  ),
-                  child: Icon(
-                    Icons.music_note,
-                    color: Colors.white,
-                    size: 50,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: voiceColor.withOpacity(0.3),
+                          blurRadius: 20,
+                          offset: Offset(0, 8),
+                        ),
+                      ],
+                    ),
+                    child: Stack(
+                      children: [
+                        Center(
+                          child: Icon(
+                            Icons.music_note,
+                            color: Colors.white,
+                            size: 60,
+                          ),
+                        ),
+                        if (isPlaying)
+                          Positioned.fill(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.3),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Center(
+                                child: Icon(
+                                  Icons.pause,
+                                  color: Colors.white,
+                                  size: 40,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
                 SizedBox(height: 20),
                 
                 // Song Title & Artist
                 Text(
-                  song.title,
+                  widget.song.title,
                   style: TextStyle(
                     color: Colors.black,
                     fontSize: 24,
@@ -453,7 +520,7 @@ class SongPreviewScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  song.artist,
+                  widget.song.artist,
                   style: TextStyle(
                     color: Colors.grey[600],
                     fontSize: 16,
@@ -461,16 +528,18 @@ class SongPreviewScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 16),
                 
-                // Voice Type Badge
+                // Enhanced Voice Type Badge
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
-                    color: voiceColor.withOpacity(0.1),
+                    gradient: LinearGradient(
+                      colors: [voiceColor.withOpacity(0.2), voiceColor.withOpacity(0.1)],
+                    ),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: voiceColor.withOpacity(0.3)),
                   ),
                   child: Text(
-                    song.voiceType,
+                    widget.song.voiceType,
                     style: TextStyle(
                       color: voiceColor,
                       fontSize: 14,
@@ -478,11 +547,48 @@ class SongPreviewScreen extends StatelessWidget {
                     ),
                   ),
                 ),
+
+                // Preview Control
+                SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    GestureDetector(
+                      onTap: _togglePreview,
+                      child: Container(
+                        padding: EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: voiceColor,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: voiceColor.withOpacity(0.3),
+                              blurRadius: 10,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          isPlaying ? Icons.stop : Icons.play_arrow,
+                          color: Colors.white,
+                          size: 32,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                if (isPlaying || totalDuration.inSeconds > 0) ...[
+                  SizedBox(height: 16),
+                  Text(
+                    'Preview: ${_formatDuration(currentPosition)} / ${_formatDuration(totalDuration)}',
+                    style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                  ),
+                ],
               ],
             ),
           ),
 
-          // Song Info
+          // Enhanced Song Info
           Expanded(
             child: SingleChildScrollView(
               padding: EdgeInsets.all(20),
@@ -499,27 +605,27 @@ class SongPreviewScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 12),
                   
-                  // Song Stats
+                  // Enhanced Song Stats
                   Row(
                     children: [
                       _buildStatCard(
                         'Duration',
-                        '${song.estimatedDuration.inMinutes}:${(song.estimatedDuration.inSeconds % 60).toString().padLeft(2, '0')}',
+                        '${widget.song.duration.inMinutes}:${(widget.song.duration.inSeconds % 60).toString().padLeft(2, '0')}',
                         Icons.timer,
                         Color(0xFF2196F3),
                       ),
                       SizedBox(width: 12),
                       _buildStatCard(
                         'Voice Type',
-                        song.voiceType.split(' ').first,
+                        widget.song.voiceType.split(' ').first,
                         Icons.person,
                         Color(0xFF4CAF50),
                       ),
                       SizedBox(width: 12),
                       _buildStatCard(
-                        'Difficulty',
-                        'Medium',
-                        Icons.bar_chart,
+                        'Segments',
+                        '${widget.song.lyricSegments.length}',
+                        Icons.list,
                         Color(0xFFFF9800),
                       ),
                     ],
@@ -543,21 +649,43 @@ class SongPreviewScreen extends StatelessWidget {
                       color: Color(0xFFF8F9FA),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Text(
-                      song.lyrics,
-                      style: TextStyle(
-                        color: Colors.grey[700],
-                        fontSize: 14,
-                        height: 1.5,
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: widget.song.lyricSegments.take(4).map((segment) {
+                        return Padding(
+                          padding: EdgeInsets.only(bottom: 8),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 6,
+                                height: 6,
+                                decoration: BoxDecoration(
+                                  color: voiceColor,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  segment.text,
+                                  style: TextStyle(
+                                    color: Colors.grey[700],
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
                     ),
                   ),
                   
                   SizedBox(height: 24),
                   
-                  // Practice Features
+                  // Enhanced Karaoke Features
                   Text(
-                    'Practice Features',
+                    'Karaoke Features',
                     style: TextStyle(
                       color: Colors.black,
                       fontSize: 16,
@@ -568,18 +696,23 @@ class SongPreviewScreen extends StatelessWidget {
                   Container(
                     padding: EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Color(0xFFF8F9FA),
+                      gradient: LinearGradient(
+                        colors: [Color(0xFF4CAF50).withOpacity(0.1), Colors.white],
+                      ),
                       borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Color(0xFF4CAF50).withOpacity(0.3)),
                     ),
                     child: Column(
                       children: [
-                        _buildFeatureRow(Icons.mic, 'Real-time pitch detection', voiceColor),
+                        _buildFeatureRow(Icons.queue_music, 'Full song karaoke with timing', Color(0xFF4CAF50)),
                         SizedBox(height: 8),
-                        _buildFeatureRow(Icons.headset, 'Full song accompaniment', voiceColor),
+                        _buildFeatureRow(Icons.mic, 'Real-time pitch detection & feedback', Color(0xFF2196F3)),
                         SizedBox(height: 8),
-                        _buildFeatureRow(Icons.analytics, 'Accuracy scoring & feedback', voiceColor),
+                        _buildFeatureRow(Icons.analytics, 'Comprehensive lyric-by-lyric analysis', Color(0xFFFF9800)),
                         SizedBox(height: 8),
-                        _buildFeatureRow(Icons.track_changes, 'Progress tracking', voiceColor),
+                        _buildFeatureRow(Icons.track_changes, 'Visual accuracy indicators', Color(0xFF9C27B0)),
+                        SizedBox(height: 8),
+                        _buildFeatureRow(Icons.school, 'Personalized improvement tips', Color(0xFFE91E63)),
                       ],
                     ),
                   ),
@@ -588,24 +721,27 @@ class SongPreviewScreen extends StatelessWidget {
             ),
           ),
 
-          // Start Singing Button
+          // Enhanced Start Button
           Container(
             padding: EdgeInsets.all(20),
             child: SizedBox(
               width: double.infinity,
-              height: 50,
+              height: 56,
               child: ElevatedButton.icon(
                 onPressed: () {
+                  if (isPlaying) {
+                    _player.stop();
+                  }
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => SingingPracticeScreen(song: song),
+                      builder: (context) => EnhancedSingingPracticeScreen(song: widget.song),
                     ),
                   );
                 },
-                icon: Icon(Icons.mic, color: Colors.white),
+                icon: Icon(Icons.queue_music, color: Colors.white, size: 24),
                 label: Text(
-                  'Start Singing',
+                  'Start Karaoke Practice',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -618,6 +754,7 @@ class SongPreviewScreen extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
+                  elevation: 4,
                 ),
               ),
             ),
@@ -630,8 +767,15 @@ class SongPreviewScreen extends StatelessWidget {
   Widget _buildFeatureRow(IconData icon, String text, Color color) {
     return Row(
       children: [
-        Icon(icon, color: color, size: 16),
-        SizedBox(width: 8),
+        Container(
+          padding: EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, color: color, size: 16),
+        ),
+        SizedBox(width: 12),
         Expanded(
           child: Text(
             text,
@@ -663,7 +807,7 @@ class SongPreviewScreen extends StatelessWidget {
               value,
               style: TextStyle(
                 color: color,
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -672,13 +816,19 @@ class SongPreviewScreen extends StatelessWidget {
               label,
               style: TextStyle(
                 color: color,
-                fontSize: 12,
+                fontSize: 11,
                 fontWeight: FontWeight.w500,
               ),
+              textAlign: TextAlign.center,
             ),
           ],
         ),
       ),
     );
+  }
+
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    return '${twoDigits(duration.inMinutes)}:${twoDigits(duration.inSeconds.remainder(60))}';
   }
 }
