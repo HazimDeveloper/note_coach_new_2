@@ -1,4 +1,4 @@
-// lib/main.dart - Complete NoteCoach Application
+// lib/main.dart - Updated to use Real-Time Voice Detection
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:math';
@@ -6,7 +6,7 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:note_coach_new_2/pitch_lesson_step2.dart';
 import 'package:note_coach_new_2/pitch_lesson_step3.dart';
-import 'package:note_coach_new_2/vocal_range_detector_screen.dart';
+import 'package:note_coach_new_2/realtime_voice_detector.dart'; // Import new detector
 
 void main() {
   runApp(NoteCoachApp());
@@ -91,7 +91,7 @@ class _MainScreenState extends State<MainScreen> {
   }
 }
 
-// Home Screen - White Theme
+// Updated Home Screen with Real-Time Voice Detection
 class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -213,6 +213,99 @@ class HomeScreen extends StatelessWidget {
             
             SizedBox(height: 24),
             
+            // Quick Voice Test Section - NEW
+            Text(
+              'Quick Voice Analysis',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 12),
+            
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => RealTimeVoiceDetector()),
+                );
+              },
+              child: Container(
+                padding: EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Color(0xFF2196F3).withOpacity(0.1),
+                      Color(0xFF2196F3).withOpacity(0.05),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Color(0xFF2196F3).withOpacity(0.3)),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Color(0xFF2196F3), Color(0xFF1976D2)],
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(Icons.graphic_eq, color: Colors.white, size: 24),
+                    ),
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Real-Time Voice Detection',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            'Instant note detection • Precise frequency analysis',
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 12,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Color(0xFF4CAF50),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              'NEW',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(Icons.arrow_forward_ios, color: Color(0xFF2196F3)),
+                  ],
+                ),
+              ),
+            ),
+            
+            SizedBox(height: 24),
+            
             // Browse Section
             Text(
               'Browse Version',
@@ -327,7 +420,7 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-// Learning Screen - List of lessons with White Theme
+// Updated Learning Screen
 class LearningScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -339,11 +432,28 @@ class LearningScreen extends StatelessWidget {
       body: ListView(
         padding: EdgeInsets.all(16),
         children: [
+          // Real-Time Voice Detection Card - NEW
+          _buildLearningCard(
+            context,
+            'Real-Time Voice Detection',
+            'Instant note detection and voice classification',
+            Icons.graphic_eq,
+            Color(0xFF4CAF50),
+            () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => RealTimeVoiceDetector()),
+            ),
+            isNew: true,
+          ),
+          
+          SizedBox(height: 16),
+          
+          // Existing Pitching Course
           _buildLearningCard(
             context,
             'Pitching',
             'Learn about pitch and frequency',
-            Icons.graphic_eq,
+            Icons.music_note,
             Color(0xFF2196F3),
             () => Navigator.push(
               context,
@@ -356,17 +466,41 @@ class LearningScreen extends StatelessWidget {
   }
 
   Widget _buildLearningCard(BuildContext context, String title, String subtitle, 
-      IconData icon, Color color, VoidCallback onTap) {
+      IconData icon, Color color, VoidCallback onTap, {bool isNew = false}) {
     return Card(
       color: Color(0xFFF5F5F5),
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
         contentPadding: EdgeInsets.all(16),
-        leading: CircleAvatar(
-          backgroundColor: color,
-          radius: 25,
-          child: Icon(icon, color: Colors.white, size: 25),
+        leading: Stack(
+          children: [
+            CircleAvatar(
+              backgroundColor: color,
+              radius: 25,
+              child: Icon(icon, color: Colors.white, size: 25),
+            ),
+            if (isNew)
+              Positioned(
+                right: 0,
+                top: 0,
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    'NEW',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 8,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+          ],
         ),
         title: Text(
           title,
@@ -387,7 +521,7 @@ class LearningScreen extends StatelessWidget {
   }
 }
 
-// Pitch Lesson Step 1 - Introduction
+// Existing Pitch Lesson Step 1 (unchanged)
 class PitchLessonStep1 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -491,6 +625,60 @@ class PitchLessonStep1 extends StatelessWidget {
                 color: Colors.grey[700],
                 fontSize: 14,
                 height: 1.5,
+              ),
+            ),
+            
+            SizedBox(height: 24),
+            
+            // Quick Start Option - NEW
+            Container(
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Color(0xFF4CAF50).withOpacity(0.1),
+                    Color(0xFF4CAF50).withOpacity(0.05),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Color(0xFF4CAF50).withOpacity(0.3)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.flash_on, color: Color(0xFF4CAF50), size: 20),
+                      SizedBox(width: 8),
+                      Text(
+                        'Quick Start Option',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Skip the theory and try our real-time voice detector now!',
+                    style: TextStyle(color: Colors.grey[700], fontSize: 14),
+                  ),
+                  SizedBox(height: 12),
+                  ElevatedButton.icon(
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => RealTimeVoiceDetector()),
+                    ),
+                    icon: Icon(Icons.mic, color: Colors.white, size: 16),
+                    label: Text('Try Voice Detector', style: TextStyle(color: Colors.white)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF4CAF50),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                  ),
+                ],
               ),
             ),
             
@@ -604,703 +792,6 @@ class PitchLessonStep1 extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-class _PitchLessonStep2State extends State<PitchLessonStep2> {
-  // Audio player instance
-  final AudioPlayer _audioPlayer = AudioPlayer();
-  
-  // Audio files mapping
-  final Map<String, String> audioTones = {
-    'A3': 'audio/tones/A3_220Hz.mp3',  // Remove 'assets/' prefix for audioplayers
-    'C4': 'audio/tones/C4_262Hz.mp3', 
-    'E4': 'audio/tones/E4_330Hz.mp3',
-    'A4': 'audio/tones/A4_440Hz.mp3',
-  };
-  
-  final Map<String, String> frequencies = {
-    'A3': '220 Hz',
-    'C4': '262 Hz',
-    'E4': '330 Hz', 
-    'A4': '440 Hz',
-  };
-
-  String? currentlyPlaying;
-
-  @override
-  void dispose() {
-    _audioPlayer.dispose();
-    super.dispose();
-  }
-  
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            Icon(Icons.music_note, color: Color(0xFF2196F3)),
-            SizedBox(width: 8),
-            Text('NOTECOACH'),
-          ],
-        ),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Step Header with Progress
-            Container(
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Color(0xFF2196F3),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        'Pitch Lesson',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Spacer(),
-                      Container(
-                        padding: EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(Icons.lightbulb, color: Colors.white, size: 16),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Step 2 of 4',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            
-            SizedBox(height: 16),
-            
-            // Progress Bar
-            Container(
-              height: 6,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(3),
-              ),
-              child: FractionallySizedBox(
-                alignment: Alignment.centerLeft,
-                widthFactor: 0.5, // 50% progress (step 2 of 4)
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Color(0xFF2196F3),
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                ),
-              ),
-            ),
-            
-            SizedBox(height: 32),
-            
-            // Title
-            Text(
-              'Listen to Different Pitches',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            
-            SizedBox(height: 16),
-            
-            // Description
-            Text(
-              'Let\'s hear different pitch levels. Pay attention to how they sound different.',
-              style: TextStyle(
-                color: Colors.grey[700],
-                fontSize: 14,
-                height: 1.5,
-              ),
-            ),
-            
-            SizedBox(height: 24),
-            
-            // Audio Instructions
-            Text(
-              'Tap to hear different pitches:',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            
-            SizedBox(height: 20),
-            
-            // Audio Buttons Grid
-            GridView.count(
-              crossAxisCount: 2,
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              childAspectRatio: 1.2,
-              children: audioTones.keys.map((note) => _buildAudioButton(note)).toList(),
-            ),
-            
-            SizedBox(height: 40),
-            
-            // What is Pitch Section
-            Container(
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Color(0xFFF5F5F5),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'What is Pitch?',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 12),
-                  Text(
-                    'Pitch refers to the highness or lowness of a sound, determined by its frequency. Matching pitch is essential for singing in tune.',
-                    style: TextStyle(
-                      color: Colors.grey[700],
-                      fontSize: 14,
-                      height: 1.5,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            
-            SizedBox(height: 16),
-            
-            // Did You Know Section
-            Container(
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Color(0xFFF5F5F5),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.lightbulb, color: Colors.amber, size: 20),
-                      SizedBox(width: 8),
-                      Text(
-                        'Did you know?',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 12),
-                  Text(
-                    'Pitch is just frequency.\nA higher frequency means a higher pitch.\nHigher pitch = faster vibrations.\nLower pitch = slower vibrations.',
-                    style: TextStyle(
-                      color: Colors.grey[700],
-                      fontSize: 13,
-                      height: 1.4,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            
-            SizedBox(height: 32),
-            
-            // Navigation Buttons
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => Navigator.pop(context),
-                    icon: Icon(Icons.arrow_back, color: Colors.grey[700], size: 16),
-                    label: Text('Previous', style: TextStyle(color: Colors.grey[700])),
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Colors.grey[400]!),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => PitchLessonStep3()),
-                    ),
-                    icon: Icon(Icons.arrow_forward, color: Colors.white, size: 16),
-                    label: Text('Next', style: TextStyle(color: Colors.white)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF2196F3),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAudioButton(String note) {
-    final isPlaying = currentlyPlaying == note;
-    
-    return GestureDetector(
-      onTap: () => _playTone(note),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Color(0xFFF5F5F5),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isPlaying ? Color(0xFF2196F3) : Colors.grey[400]!,
-            width: isPlaying ? 2 : 1,
-          ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              isPlaying ? Icons.pause : Icons.play_arrow,
-              color: isPlaying ? Color(0xFF2196F3) : Colors.grey[700],
-              size: 32,
-            ),
-            SizedBox(height: 12),
-            Text(
-              note,
-              style: TextStyle(
-                color: isPlaying ? Color(0xFF2196F3) : Colors.black,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 4),
-            Text(
-              frequencies[note]!,
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 12,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _playTone(String note) async {
-    try {
-      if (currentlyPlaying == note) {
-        // Stop current tone
-        await _audioPlayer.stop();
-        setState(() {
-          currentlyPlaying = null;
-        });
-      } else {
-        // Stop any currently playing audio
-        await _audioPlayer.stop();
-        
-        // Play new tone
-        setState(() {
-          currentlyPlaying = note;
-        });
-        
-        // Play audio from assets
-        await _audioPlayer.play(AssetSource(audioTones[note]!));
-        
-        // Listen for completion
-        _audioPlayer.onPlayerComplete.listen((_) {
-          if (mounted) {
-            setState(() {
-              currentlyPlaying = null;
-            });
-          }
-        });
-      }
-    } catch (e) {
-      print('Error playing audio: $e');
-      // If file not found, show message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Audio file not found: ${audioTones[note]}'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      
-      setState(() {
-        currentlyPlaying = null;
-      });
-    }
-  }
-}
-
-// Individual Notes Lesson Screen - White Theme
-class NotesLessonScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Learning Course'),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Profile section
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 25,
-                  backgroundColor: Color(0xFF2196F3),
-                  child: Text('AH', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                ),
-                SizedBox(width: 12),
-                Text(
-                  'Learning Course',
-                  style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            
-            SizedBox(height: 32),
-            
-            // Title with icon
-            Row(
-              children: [
-                Icon(Icons.music_note, color: Color(0xFF4CAF50), size: 28),
-                SizedBox(width: 12),
-                Text(
-                  'Notes in Singing',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            
-            SizedBox(height: 24),
-            
-            Text(
-              'What Are Notes?',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            
-            SizedBox(height: 12),
-            
-            Text(
-              'Notes are the building blocks of music. Each note represents a specific pitch, forming the basis of melodies.',
-              style: TextStyle(
-                color: Colors.grey[700],
-                fontSize: 14,
-                height: 1.5,
-              ),
-            ),
-            
-            SizedBox(height: 24),
-            
-            // Did You Know Section
-            Container(
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Color(0xFFF5F5F5),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.lightbulb, color: Colors.amber, size: 20),
-                      SizedBox(width: 8),
-                      Text(
-                        'Did you know?',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 12),
-                  Text(
-                    'All the music you hear. Only 12 unique notes in music exist that are just repeated in different octaves.',
-                    style: TextStyle(
-                      color: Colors.grey[700],
-                      fontSize: 13,
-                      height: 1.4,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            
-            SizedBox(height: 32),
-            
-            // Next Button
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => VocalRangeIntroScreen()),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF4CAF50),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                ),
-                child: Text(
-                  'Next',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// Vocal Range Introduction Screen (separate) - White Theme
-class VocalRangeIntroScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Learning Course'),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Profile section
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 25,
-                  backgroundColor: Color(0xFF2196F3),
-                  child: Text('AH', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                ),
-                SizedBox(width: 12),
-                Text(
-                  'Learning Course',
-                  style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            
-            SizedBox(height: 32),
-            
-            // Title with icon
-            Row(
-              children: [
-                Icon(Icons.record_voice_over, color: Color(0xFFFF9800), size: 28),
-                SizedBox(width: 12),
-                Text(
-                  'Vocal Range',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            
-            SizedBox(height: 24),
-            
-            Text(
-              'Find your vocal range',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            
-            SizedBox(height: 24),
-            
-            // Vocal Range Chart (as shown in report)
-            Container(
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Color(0xFFF5F5F5),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                children: [
-                  // First row
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: ['F2', 'F#2', 'G2', 'G#2', 'A2', 'A#2'].map((note) =>
-                      Container(
-                        width: 35,
-                        height: 25,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey[400]!),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Center(
-                          child: Text(note, style: TextStyle(color: Colors.black, fontSize: 9)),
-                        ),
-                      )
-                    ).toList(),
-                  ),
-                  SizedBox(height: 4),
-                  // Second row
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: ['B2', 'C3', 'C#3', 'D3', 'D#3', 'E3'].map((note) =>
-                      Container(
-                        width: 35,
-                        height: 25,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey[400]!),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Center(
-                          child: Text(note, style: TextStyle(color: Colors.black, fontSize: 9)),
-                        ),
-                      )
-                    ).toList(),
-                  ),
-                  SizedBox(height: 4),
-                  // Third row
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: ['F3', 'F#3', 'G3', 'G#3', 'A3', 'A#3'].map((note) =>
-                      Container(
-                        width: 35,
-                        height: 25,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey[400]!),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Center(
-                          child: Text(note, style: TextStyle(color: Colors.black, fontSize: 9)),
-                        ),
-                      )
-                    ).toList(),
-                  ),
-                  SizedBox(height: 4),
-                  // Fourth row
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: ['B3', 'C4', 'C#4', 'D4', 'D#4', 'E4'].map((note) =>
-                      Container(
-                        width: 35,
-                        height: 25,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey[400]!),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Center(
-                          child: Text(note, style: TextStyle(color: Colors.black, fontSize: 9)),
-                        ),
-                      )
-                    ).toList(),
-                  ),
-                ],
-              ),
-            ),
-            
-            SizedBox(height: 24),
-            
-            // Explanation text (exact from report)
-            Text(
-              'We\'ll play a series of notes until you\'ll match them by humming or singing. The app will detect your highest and lowest notes. This determines your vocal range.',
-              style: TextStyle(
-                color: Colors.grey[700],
-                fontSize: 14,
-                height: 1.5,
-              ),
-            ),
-            
-            SizedBox(height: 32),
-            
-            // Start Button (as shown in report)
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: () {
-                  // Navigate to VocalRangeDetectorScreen
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => ImprovedVocalRangeDetector()),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF2196F3),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                ),
-                child: Text(
-                  'START VOCAL RANGE',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
