@@ -249,8 +249,8 @@ class SingScreen extends StatelessWidget {
               height: 200,
               child: ListView(
                 scrollDirection: Axis.horizontal,
-                children: EnhancedSongDatabase.getSongs().map((song) {
-                  final voiceColor = EnhancedSongDatabase.getVoiceTypeColor(song.voiceType);
+                children: PitchDetectionSongDatabase.getSongs().map((song) {
+                  final voiceColor = PitchDetectionSongDatabase.getVoiceTypeColor(song.voiceType);
                   return Container(
                     width: 160,
                     margin: EdgeInsets.only(right: 12),
