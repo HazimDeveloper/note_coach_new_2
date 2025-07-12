@@ -1,13 +1,16 @@
-// lib/enhanced_singing_practice_screen.dart
+// lib/singing_practice_screen.dart - REAL Voice Detection for Karaoke
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:record/record.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:math';
 import 'dart:async';
+import 'dart:typed_data';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 import 'package:note_coach_new_2/realtime_voice_detector.dart' show PreciseVoiceFrequencies;
 
-// Enhanced Song Data with timing and full lyrics
+// Enhanced Song Data with ACCURATE timing and full lyrics
 class LyricSegment {
   final String text;
   final double startTime; // in seconds
@@ -29,6 +32,7 @@ class EnhancedSongData {
   final String artist;
   final String voiceType;
   final String accompanimentPath;
+  final String previewPath; // NEW: Preview path
   final Duration duration;
   final List<LyricSegment> lyricSegments;
 
@@ -37,80 +41,88 @@ class EnhancedSongData {
     required this.artist,
     required this.voiceType,
     required this.accompanimentPath,
+    required this.previewPath,
     required this.duration,
     required this.lyricSegments,
   });
 }
 
-// Song database with full timing
+// Song database with ACCURATE timing from user
 class EnhancedSongDatabase {
   static List<EnhancedSongData> getSongs() {
     return [
-      // AMIR JAHARI – HASRAT (BARITONE)
+      // AMIR JAHARI – HASRAT (BARITONE) - 28 seconds
       EnhancedSongData(
         title: "Hasrat",
         artist: "Amir Jahari",
         voiceType: "BARITONE",
         accompanimentPath: "song/AMIR JAHARI - HASRAT (OST IMAGINUR) - BARITONE-Accompaniment.mp3",
-        duration: Duration(minutes: 3, seconds: 30),
+        previewPath: "song/preview/AMIR JAHARI - HASRAT (OST IMAGINUR) - BARITONE.mp3",
+        duration: Duration(seconds: 28),
         lyricSegments: [
-          LyricSegment(text: "Teriaklah sekuat mana pun aku", startTime: 10.0, endTime: 15.0, targetFrequency: 130.81, targetNote: "C3"),
-          LyricSegment(text: "Suara ini tidak mendengar", startTime: 15.5, endTime: 20.0, targetFrequency: 146.83, targetNote: "D3"),
-          LyricSegment(text: "Menangislah sesedih mana pun aku", startTime: 25.0, endTime: 30.0, targetFrequency: 164.81, targetNote: "E3"),
-          LyricSegment(text: "Mata ini tidak melihat", startTime: 30.5, endTime: 35.0, targetFrequency: 174.61, targetNote: "F3"),
-          LyricSegment(text: "Kau yang selama ini ku tunggu", startTime: 40.0, endTime: 45.0, targetFrequency: 130.81, targetNote: "C3"),
-          LyricSegment(text: "Dimana dirimu kini berada", startTime: 45.5, endTime: 50.0, targetFrequency: 146.83, targetNote: "D3"),
+          LyricSegment(text: "Teriaklah", startTime: 0.02, endTime: 0.06, targetFrequency: 130.81, targetNote: "C3"),
+          LyricSegment(text: "Sekuat mana pun aku", startTime: 0.06, endTime: 0.10, targetFrequency: 146.83, targetNote: "D3"),
+          LyricSegment(text: "Suara ini", startTime: 0.10, endTime: 0.12, targetFrequency: 164.81, targetNote: "E3"),
+          LyricSegment(text: "Tiada mendengar", startTime: 0.12, endTime: 0.17, targetFrequency: 174.61, targetNote: "F3"),
+          LyricSegment(text: "Teriaklah", startTime: 0.17, endTime: 0.18, targetFrequency: 130.81, targetNote: "C3"),
+          LyricSegment(text: "Berhentilah berharap", startTime: 0.18, endTime: 0.22, targetFrequency: 146.83, targetNote: "D3"),
         ],
       ),
 
-      // ANDMESH KAMALENG – CINTA LUAR BIASA (TENOR MALE)
+      // ANDMESH KAMALENG – CINTA LUAR BIASA (TENOR MALE) - 29 seconds
       EnhancedSongData(
         title: "Cinta Luar Biasa",
         artist: "Andmesh Kamaleng", 
         voiceType: "TENOR MALE",
         accompanimentPath: "song/Andmesh - Cinta Luar Biasa - TENOR MALE-Accompaniment.mp3",
-        duration: Duration(minutes: 4, seconds: 15),
+        previewPath: "song/preview/Andmesh - Cinta Luar Biasa - TENOR MALE.mp3",
+        duration: Duration(seconds: 29),
         lyricSegments: [
-          LyricSegment(text: "Rasa ini tak tertahan", startTime: 8.0, endTime: 12.0, targetFrequency: 196.00, targetNote: "G3"),
-          LyricSegment(text: "Hati ini selalu untukmu", startTime: 12.5, endTime: 17.0, targetFrequency: 220.00, targetNote: "A3"),
-          LyricSegment(text: "Cinta yang luar biasa", startTime: 22.0, endTime: 26.0, targetFrequency: 246.94, targetNote: "B3"),
-          LyricSegment(text: "Terlahir dari dalam jiwa", startTime: 26.5, endTime: 30.0, targetFrequency: 261.63, targetNote: "C4"),
-          LyricSegment(text: "Tak pernah ku rasakan", startTime: 35.0, endTime: 39.0, targetFrequency: 220.00, targetNote: "A3"),
-          LyricSegment(text: "Seindah cinta yang kau beri", startTime: 39.5, endTime: 44.0, targetFrequency: 246.94, targetNote: "B3"),
+          LyricSegment(text: "Rasa ini", startTime: 0.01, endTime: 0.04, targetFrequency: 196.00, targetNote: "G3"),
+          LyricSegment(text: "Tak tertahan", startTime: 0.04, endTime: 0.08, targetFrequency: 220.00, targetNote: "A3"),
+          LyricSegment(text: "Hati ini", startTime: 0.08, endTime: 0.10, targetFrequency: 246.94, targetNote: "B3"),
+          LyricSegment(text: "Selalu untukmu", startTime: 0.10, endTime: 0.15, targetFrequency: 261.63, targetNote: "C4"),
+          LyricSegment(text: "Terimalah lagu ini", startTime: 0.15, endTime: 0.18, targetFrequency: 220.00, targetNote: "A3"),
+          LyricSegment(text: "Dari orang biasa", startTime: 0.18, endTime: 0.22, targetFrequency: 246.94, targetNote: "B3"),
+          LyricSegment(text: "Tapi cintaku padamu luar biasa", startTime: 0.22, endTime: 0.29, targetFrequency: 261.63, targetNote: "C4"),
         ],
       ),
 
-      // DATO' SITI NURHALIZA – BUKAN CINTA BIASA (TENOR FEMALE)
+      // DATO' SITI NURHALIZA – BUKAN CINTA BIASA (TENOR FEMALE) - 25 seconds
       EnhancedSongData(
         title: "Bukan Cinta Biasa", 
         artist: "Dato' Siti Nurhaliza",
         voiceType: "TENOR FEMALE",
         accompanimentPath: "song/Dato' Siti Nurhaliza - Bukan Cinta Biasa - TENOR FEMALE-Accompaniment.mp3",
-        duration: Duration(minutes: 3, seconds: 45),
+        previewPath: "song/preview/Dato' Siti Nurhaliza - Bukan Cinta Biasa - TENOR FEMALE.mp3",
+        duration: Duration(seconds: 25),
         lyricSegments: [
-          LyricSegment(text: "Mengapa mereka selalu bertanya", startTime: 12.0, endTime: 17.0, targetFrequency: 293.66, targetNote: "D4"),
-          LyricSegment(text: "Cinta ku bukan di atas kertas", startTime: 17.5, endTime: 22.0, targetFrequency: 329.63, targetNote: "E4"),
-          LyricSegment(text: "Bukan cinta biasa", startTime: 27.0, endTime: 30.0, targetFrequency: 349.23, targetNote: "F4"),
-          LyricSegment(text: "Yang mudah tergoda", startTime: 30.5, endTime: 34.0, targetFrequency: 392.00, targetNote: "G4"),
-          LyricSegment(text: "Ini cinta yang membara", startTime: 39.0, endTime: 43.0, targetFrequency: 329.63, targetNote: "E4"),
-          LyricSegment(text: "Sampai nafas terakhir", startTime: 43.5, endTime: 47.0, targetFrequency: 349.23, targetNote: "F4"),
+          LyricSegment(text: "Mengapa mereka selalu bertanya", startTime: 0.00, endTime: 0.07, targetFrequency: 293.66, targetNote: "D4"),
+          LyricSegment(text: "Cintaku bukan di atas kertas", startTime: 0.07, endTime: 0.11, targetFrequency: 329.63, targetNote: "E4"),
+          LyricSegment(text: "Cintaku getaran yang sama", startTime: 0.11, endTime: 0.15, targetFrequency: 349.23, targetNote: "F4"),
+          LyricSegment(text: "Tak perlu dipaksa", startTime: 0.15, endTime: 0.17, targetFrequency: 392.00, targetNote: "G4"),
+          LyricSegment(text: "Tak perlu dicari", startTime: 0.17, endTime: 0.19, targetFrequency: 329.63, targetNote: "E4"),
+          LyricSegment(text: "Kerna ku yakin ada jawabnya", startTime: 0.19, endTime: 0.25, targetFrequency: 349.23, targetNote: "F4"),
         ],
       ),
 
-      // AINA ABDUL – JANGAN MATI RASA ITU (ALTO)
+      // AINA ABDUL – JANGAN MATI RASA ITU (ALTO) - 32 seconds
       EnhancedSongData(
         title: "Jangan Mati Rasa Itu",
         artist: "Aina Abdul",
         voiceType: "ALTO", 
         accompanimentPath: "song/Aina Abdul - Jangan Mati Rasa Itu - ALTO-Accompaniment.mp3",
-        duration: Duration(minutes: 3, seconds: 20),
+        previewPath: "song/preview/Aina Abdul - Jangan Mati Rasa Itu - ALTO.mp3",
+        duration: Duration(seconds: 32),
         lyricSegments: [
-          LyricSegment(text: "Kasihmu terus hidup", startTime: 15.0, endTime: 19.0, targetFrequency: 220.00, targetNote: "A3"),
-          LyricSegment(text: "Jangan mati rasa itu", startTime: 19.5, endTime: 24.0, targetFrequency: 246.94, targetNote: "B3"),
-          LyricSegment(text: "Walau dunia meninggalkan kita", startTime: 29.0, endTime: 34.0, targetFrequency: 261.63, targetNote: "C4"),
-          LyricSegment(text: "Jangan pernah berputus asa", startTime: 34.5, endTime: 39.0, targetFrequency: 293.66, targetNote: "D4"),
-          LyricSegment(text: "Kerana cinta yang sejati", startTime: 44.0, endTime: 48.0, targetFrequency: 246.94, targetNote: "B3"),
-          LyricSegment(text: "Akan kekal selamanya", startTime: 48.5, endTime: 52.0, targetFrequency: 261.63, targetNote: "C4"),
+          LyricSegment(text: "Kasihmu", startTime: 0.01, endTime: 0.04, targetFrequency: 220.00, targetNote: "A3"),
+          LyricSegment(text: "Terus hidup", startTime: 0.04, endTime: 0.07, targetFrequency: 246.94, targetNote: "B3"),
+          LyricSegment(text: "Jangan mati rasa", startTime: 0.07, endTime: 0.12, targetFrequency: 261.63, targetNote: "C4"),
+          LyricSegment(text: "Itu", startTime: 0.12, endTime: 0.17, targetFrequency: 293.66, targetNote: "D4"),
+          LyricSegment(text: "Bagaimana", startTime: 0.17, endTime: 0.24, targetFrequency: 246.94, targetNote: "B3"),
+          LyricSegment(text: "Harus ku", startTime: 0.24, endTime: 0.27, targetFrequency: 261.63, targetNote: "C4"),
+          LyricSegment(text: "Jalani", startTime: 0.27, endTime: 0.29, targetFrequency: 293.66, targetNote: "D4"),
+          LyricSegment(text: "Tanpa kamu", startTime: 0.29, endTime: 0.32, targetFrequency: 220.00, targetNote: "A3"),
         ],
       ),
     ];
@@ -133,13 +145,14 @@ class EnhancedSongDatabase {
   }
 }
 
-// Performance tracking data
+// REAL Performance tracking data
 class PerformanceData {
   final double accuracy;
   final bool wasOnPitch;
   final double detectedFrequency;
   final String detectedNote;
   final LyricSegment segment;
+  final DateTime timestamp;
   
   PerformanceData({
     required this.accuracy,
@@ -147,10 +160,94 @@ class PerformanceData {
     required this.detectedFrequency,
     required this.detectedNote,
     required this.segment,
+    required this.timestamp,
   });
 }
 
-// Main Enhanced Karaoke Singing Practice Screen
+// REAL Voice Detection Utils
+class RealVoiceDetection {
+  static double detectPitchFromSamples(List<double> samples, int sampleRate) {
+    if (samples.length < 1024) return 0.0;
+    
+    // Apply Hann window
+    List<double> windowed = _applyHannWindow(samples);
+    
+    // Autocorrelation pitch detection
+    return _autocorrelationPitchDetection(windowed, sampleRate);
+  }
+
+  static List<double> _applyHannWindow(List<double> samples) {
+    List<double> windowed = [];
+    int length = samples.length;
+    
+    for (int i = 0; i < length; i++) {
+      double window = 0.5 * (1 - cos(2 * pi * i / (length - 1)));
+      windowed.add(samples[i] * window);
+    }
+    return windowed;
+  }
+
+  static double _autocorrelationPitchDetection(List<double> samples, int sampleRate) {
+    int length = samples.length;
+    List<double> autocorr = List.filled(length ~/ 2, 0.0);
+    
+    // Calculate autocorrelation
+    for (int lag = 0; lag < length ~/ 2; lag++) {
+      double sum = 0.0;
+      for (int i = 0; i < length - lag; i++) {
+        sum += samples[i] * samples[i + lag];
+      }
+      autocorr[lag] = sum;
+    }
+    
+    // Find peak
+    double maxVal = autocorr[0];
+    int bestLag = 0;
+    
+    for (int lag = sampleRate ~/ 800; lag < sampleRate ~/ 80; lag++) {
+      if (lag < autocorr.length && autocorr[lag] > maxVal * 0.5 && 
+          autocorr[lag] > autocorr[lag - 1] && 
+          lag + 1 < autocorr.length && autocorr[lag] > autocorr[lag + 1]) {
+        maxVal = autocorr[lag];
+        bestLag = lag;
+        break;
+      }
+    }
+    
+    if (bestLag == 0) return 0.0;
+    return sampleRate / bestLag;
+  }
+
+  static double calculateAccuracy(double detectedFreq, double targetFreq) {
+    if (targetFreq == 0 || detectedFreq == 0) return 0.0;
+    
+    double ratio = detectedFreq / targetFreq;
+    double cents = 1200 * log(ratio) / ln2;
+    
+    double accuracy = max(0.0, 1.0 - (cents.abs() / 50.0));
+    return accuracy.clamp(0.0, 1.0);
+  }
+
+  static String frequencyToNote(double frequency) {
+    if (frequency <= 0) return "---";
+    
+    // Find closest note
+    String closestNote = '';
+    double minDifference = double.infinity;
+    
+    PreciseVoiceFrequencies.getAllNotes().forEach((note, noteFreq) {
+      double difference = (frequency - noteFreq).abs();
+      if (difference < minDifference) {
+        minDifference = difference;
+        closestNote = note;
+      }
+    });
+    
+    return minDifference < 25.0 ? closestNote : "---";
+  }
+}
+
+// Main Enhanced Karaoke Singing Practice Screen with REAL voice detection
 class EnhancedSingingPracticeScreen extends StatefulWidget {
   final EnhancedSongData song;
 
@@ -173,13 +270,18 @@ class _EnhancedSingingPracticeScreenState extends State<EnhancedSingingPracticeS
   bool isInitialized = false;
   bool showInstructions = true;
   
+  // REAL voice detection
+  String? audioFilePath;
+  List<double> audioSamples = [];
+  static const int sampleRate = 44100;
+  
   // Timing and progress
   double currentTime = 0.0;
   Timer? progressTimer;
   LyricSegment? currentSegment;
   int currentSegmentIndex = -1;
   
-  // Performance tracking
+  // REAL Performance tracking
   List<PerformanceData> performanceHistory = [];
   double currentDetectedFrequency = 0.0;
   String currentDetectedNote = '';
@@ -224,6 +326,12 @@ class _EnhancedSingingPracticeScreenState extends State<EnhancedSingingPracticeS
     waveformTimer?.cancel();
     _recorder.dispose();
     _accompanimentPlayer.dispose();
+    
+    // Clean up audio file
+    if (audioFilePath != null && File(audioFilePath!).existsSync()) {
+      File(audioFilePath!).delete().catchError((_) {});
+    }
+    
     super.dispose();
   }
 
@@ -239,7 +347,6 @@ class _EnhancedSingingPracticeScreenState extends State<EnhancedSingingPracticeS
   }
 
   void _setupAnimations() {
-    // Lyric highlight animation
     lyricAnimController = AnimationController(
       duration: Duration(milliseconds: 800),
       vsync: this,
@@ -248,7 +355,6 @@ class _EnhancedSingingPracticeScreenState extends State<EnhancedSingingPracticeS
       CurvedAnimation(parent: lyricAnimController!, curve: Curves.easeInOut),
     );
 
-    // Accuracy feedback animation
     accuracyAnimController = AnimationController(
       duration: Duration(milliseconds: 300),
       vsync: this,
@@ -273,23 +379,29 @@ class _EnhancedSingingPracticeScreenState extends State<EnhancedSingingPracticeS
         totalCorrectSegments = 0;
         currentFeedbackText = 'Karaoke starting...';
         currentFeedbackColor = Color(0xFF2196F3);
+        audioSamples.clear();
       });
+
+      // Setup audio file path
+      final directory = await getTemporaryDirectory();
+      audioFilePath = '${directory.path}/karaoke_${DateTime.now().millisecondsSinceEpoch}.wav';
 
       // Start accompaniment playback
       await _accompanimentPlayer.play(AssetSource(widget.song.accompanimentPath));
       
-      // Start voice recording for analysis
+      // Start REAL voice recording
       await _recorder.start(
         const RecordConfig(
           encoder: AudioEncoder.wav,
           bitRate: 128000,
-          sampleRate: 44100,
+          sampleRate: sampleRate,
           numChannels: 1,
-        ), path: '',
+        ), 
+        path: audioFilePath!,
       );
 
       _startProgressTracking();
-      _startRealTimePitchDetection();
+      _startRealVoicePitchDetection(); // REAL detection now!
       _startWaveformVisualization();
 
       // Listen for song completion
@@ -314,26 +426,32 @@ class _EnhancedSingingPracticeScreenState extends State<EnhancedSingingPracticeS
         currentTime += 0.1;
       });
 
-      // Update total practice time
       if (sessionStartTime != null) {
         totalPracticeTime = DateTime.now().difference(sessionStartTime!);
       }
 
-      // Check for current lyric segment
       _updateCurrentSegment();
     });
   }
 
+  // 1. Lirik keluar ikut masa
   void _updateCurrentSegment() {
     LyricSegment? newSegment;
     int newIndex = -1;
-
     for (int i = 0; i < widget.song.lyricSegments.length; i++) {
       final segment = widget.song.lyricSegments[i];
       if (currentTime >= segment.startTime && currentTime <= segment.endTime) {
         newSegment = segment;
         newIndex = i;
         break;
+      }
+    }
+    // Fallback: kekalkan lirik terakhir jika currentTime > endTime terakhir
+    if (newSegment == null && widget.song.lyricSegments.isNotEmpty) {
+      final last = widget.song.lyricSegments.last;
+      if (currentTime > last.endTime) {
+        newSegment = last;
+        newIndex = widget.song.lyricSegments.length - 1;
       }
     }
 
@@ -356,81 +474,103 @@ class _EnhancedSingingPracticeScreenState extends State<EnhancedSingingPracticeS
     }
   }
 
-  void _startRealTimePitchDetection() {
+  // REAL Voice Detection Implementation
+  void _startRealVoicePitchDetection() {
     pitchAnalysisTimer = Timer.periodic(Duration(milliseconds: 200), (timer) {
       if (!isPlaying || !isRecording) {
         timer.cancel();
         return;
       }
 
-      _simulateRealTimePitchDetection();
+      _analyzeRealVoice();
     });
   }
 
-  void _simulateRealTimePitchDetection() {
-    final random = Random();
-    
-    if (currentSegment != null) {
-      final targetFreq = currentSegment!.targetFrequency;
+  Future<void> _analyzeRealVoice() async {
+    if (audioFilePath == null || !File(audioFilePath!).existsSync()) {
+      return;
+    }
+
+    try {
+      // Read current audio file
+      final audioFile = File(audioFilePath!);
+      final fileSize = await audioFile.length();
       
-      // Simulate realistic pitch detection with accuracy variation
-      bool shouldBeAccurate = random.nextDouble() > 0.25; // 75% accuracy simulation
+      if (fileSize < 8000) return; // Need minimum data
       
-      if (shouldBeAccurate) {
-        // Simulate good singing (within ±15 Hz)
-        currentDetectedFrequency = targetFreq + (random.nextDouble() - 0.5) * 30;
-        currentAccuracy = 0.75 + random.nextDouble() * 0.25; // 75-100% accuracy
+      final audioBytes = await audioFile.readAsBytes();
+      List<double> samples = _convertBytesToSamples(audioBytes);
+      
+      if (samples.length < 1000) return;
+
+      // Get recent samples for analysis
+      int startIndex = samples.length > sampleRate ? samples.length - sampleRate : 0;
+      List<double> recentSamples = samples.sublist(startIndex);
+      
+      // REAL pitch detection (no dummy, no fallback)
+      double detectedFreq = RealVoiceDetection.detectPitchFromSamples(recentSamples, sampleRate);
+      
+      if (detectedFreq > 80 && detectedFreq < 600) { // Valid vocal range
+        _processRealDetectedFrequency(detectedFreq);
       } else {
-        // Simulate off-pitch singing
-        currentDetectedFrequency = targetFreq + (random.nextDouble() - 0.5) * 80;
-        currentAccuracy = 0.3 + random.nextDouble() * 0.4; // 30-70% accuracy
+        // Clear detection if no valid frequency
+        setState(() {
+          currentDetectedFrequency = 0.0;
+          currentDetectedNote = '';
+          currentAccuracy = 0.0;
+          isCurrentlyOnPitch = false;
+        });
       }
+    } catch (e) {
+      print('Error analyzing real voice: $e');
+    }
+  }
+
+  List<double> _convertBytesToSamples(Uint8List bytes) {
+    List<double> samples = [];
+    
+    // Skip WAV header (44 bytes)
+    int startIndex = min(44, bytes.length);
+    
+    for (int i = startIndex; i < bytes.length - 1; i += 2) {
+      if (i + 1 < bytes.length) {
+        int sample16 = bytes[i] | (bytes[i + 1] << 8);
+        if (sample16 > 32767) sample16 -= 65536;
+        double normalizedSample = sample16 / 32768.0;
+        samples.add(normalizedSample);
+      }
+    }
+    
+    return samples;
+  }
+
+  // 2. Accuracy sentiasa update ikut suara user
+  void _processRealDetectedFrequency(double frequency) {
+    setState(() {
+      currentDetectedFrequency = frequency;
+      currentDetectedNote = RealVoiceDetection.frequencyToNote(frequency);
+    });
+
+    if (currentSegment != null) {
+      // Calculate REAL accuracy (no dummy)
+      currentAccuracy = RealVoiceDetection.calculateAccuracy(frequency, currentSegment!.targetFrequency);
       
-      // Determine if on pitch (within 25 Hz tolerance)
-      double frequencyDiff = (currentDetectedFrequency - targetFreq).abs();
-      isCurrentlyOnPitch = frequencyDiff < 25.0 && currentAccuracy > 0.7;
+      // Determine if on pitch (within tolerance)
+      double frequencyDiff = (frequency - currentSegment!.targetFrequency).abs();
+      isCurrentlyOnPitch = frequencyDiff < 30.0 && currentAccuracy > 0.6;
       
-      // Find detected note
-      currentDetectedNote = _frequencyToNote(currentDetectedFrequency);
-      
-      // Update visual feedback
+      // Update visual feedback based on REAL accuracy
       _updateRealTimeFeedback();
       
-      // Store performance data for analysis
-      _recordPerformanceData();
-      
-    } else {
-      // Not in a singing segment
-      currentDetectedFrequency = 0.0;
-      currentAccuracy = 0.0;
-      isCurrentlyOnPitch = false;
-      currentDetectedNote = '';
-      currentFeedbackColor = Colors.grey;
-      currentFeedbackText = 'Instrumental section...';
+      // Store REAL performance data
+      _recordRealPerformanceData();
     }
     
     setState(() {});
   }
 
-  String _frequencyToNote(double frequency) {
-    if (frequency < 50 || frequency > 1200) return '---';
-    
-    String closestNote = '';
-    double minDifference = double.infinity;
-    
-    PreciseVoiceFrequencies.getAllNotes().forEach((note, noteFreq) {
-      double difference = (frequency - noteFreq).abs();
-      if (difference < minDifference) {
-        minDifference = difference;
-        closestNote = note;
-      }
-    });
-    
-    return closestNote;
-  }
-
   void _updateRealTimeFeedback() {
-    if (isCurrentlyOnPitch && currentAccuracy > 0.75) {
+    if (isCurrentlyOnPitch && currentAccuracy > 0.8) {
       currentFeedbackColor = Color(0xFF4CAF50); // Green for excellent
       currentFeedbackText = 'Perfect! Keep it up!';
       accuracyAnimController?.forward().then((_) => accuracyAnimController?.reverse());
@@ -446,7 +586,7 @@ class _EnhancedSingingPracticeScreenState extends State<EnhancedSingingPracticeS
     }
   }
 
-  void _recordPerformanceData() {
+  void _recordRealPerformanceData() {
     if (currentSegment == null) return;
     
     performanceHistory.add(PerformanceData(
@@ -455,6 +595,7 @@ class _EnhancedSingingPracticeScreenState extends State<EnhancedSingingPracticeS
       detectedFrequency: currentDetectedFrequency,
       detectedNote: currentDetectedNote,
       segment: currentSegment!,
+      timestamp: DateTime.now(),
     ));
     
     if (isCurrentlyOnPitch) {
@@ -472,8 +613,8 @@ class _EnhancedSingingPracticeScreenState extends State<EnhancedSingingPracticeS
       final random = Random();
       
       for (int i = 0; i < waveformData.length; i++) {
-        if (currentSegment != null && currentDetectedFrequency > 0) {
-          // Active singing waveform
+        if (currentDetectedFrequency > 0) {
+          // Active singing waveform based on REAL detection
           double baseAmplitude = 0.4 + (currentAccuracy * 0.5);
           double voicePattern = sin(DateTime.now().millisecondsSinceEpoch / 150.0 + i * 0.3) * 0.4;
           double randomVariation = (random.nextDouble() - 0.5) * 0.15;
@@ -563,8 +704,9 @@ class _EnhancedSingingPracticeScreenState extends State<EnhancedSingingPracticeS
             '♪ Instrumental ♪',
             style: TextStyle(
               color: Colors.grey[600],
-              fontSize: 18,
+              fontSize: 22,
               fontStyle: FontStyle.italic,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ),
@@ -577,19 +719,23 @@ class _EnhancedSingingPracticeScreenState extends State<EnhancedSingingPracticeS
         return Transform.scale(
           scale: lyricAnimation!.value,
           child: Container(
-            padding: EdgeInsets.all(20),
+            padding: EdgeInsets.all(24),
             margin: EdgeInsets.symmetric(horizontal: 20),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [
-                  currentFeedbackColor.withOpacity(0.1),
-                  currentFeedbackColor.withOpacity(0.05),
-                ],
+                colors: [currentFeedbackColor.withOpacity(0.18), Colors.white],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: currentFeedbackColor.withOpacity(0.3)),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: currentFeedbackColor.withOpacity(0.35), width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: currentFeedbackColor.withOpacity(0.08),
+                  blurRadius: 16,
+                  offset: Offset(0, 4),
+                ),
+              ],
             ),
             child: Column(
               children: [
@@ -597,27 +743,28 @@ class _EnhancedSingingPracticeScreenState extends State<EnhancedSingingPracticeS
                   'Current Lyrics',
                   style: TextStyle(
                     color: Colors.grey[600],
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                SizedBox(height: 12),
+                SizedBox(height: 16),
                 Text(
                   currentSegment!.text,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 30,
                     fontWeight: FontWeight.bold,
                     color: currentFeedbackColor,
                     height: 1.3,
+                    shadows: [Shadow(blurRadius: 8, color: currentFeedbackColor.withOpacity(0.18))],
                   ),
                 ),
-                SizedBox(height: 8),
+                SizedBox(height: 12),
                 Text(
                   'Target: ${currentSegment!.targetNote} (${currentSegment!.targetFrequency.toStringAsFixed(1)} Hz)',
                   style: TextStyle(
                     color: Colors.grey[600],
-                    fontSize: 12,
+                    fontSize: 14,
                   ),
                 ),
               ],
@@ -632,7 +779,6 @@ class _EnhancedSingingPracticeScreenState extends State<EnhancedSingingPracticeS
     double progress = widget.song.duration.inSeconds > 0 
         ? currentTime / widget.song.duration.inSeconds 
         : 0.0;
-    
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 20),
       child: Column(
@@ -642,28 +788,28 @@ class _EnhancedSingingPracticeScreenState extends State<EnhancedSingingPracticeS
             children: [
               Text(
                 '${_formatDuration(Duration(seconds: currentTime.toInt()))}',
-                style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                style: TextStyle(color: Colors.grey[600], fontSize: 13),
               ),
               Text(
-                'Overall Accuracy: ${(overallAccuracy * 100).toInt()}%',
+                'Accuracy: ${(currentAccuracy * 100).toInt()}%',
                 style: TextStyle(
                   color: currentFeedbackColor,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
                 '${_formatDuration(widget.song.duration)}',
-                style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                style: TextStyle(color: Colors.grey[600], fontSize: 13),
               ),
             ],
           ),
-          SizedBox(height: 8),
+          SizedBox(height: 10),
           LinearProgressIndicator(
             value: progress.clamp(0.0, 1.0),
             backgroundColor: Colors.grey[300],
             valueColor: AlwaysStoppedAnimation<Color>(currentFeedbackColor),
-            minHeight: 6,
+            minHeight: 8,
           ),
         ],
       ),
@@ -675,324 +821,335 @@ class _EnhancedSingingPracticeScreenState extends State<EnhancedSingingPracticeS
     return '${twoDigits(duration.inMinutes)}:${twoDigits(duration.inSeconds.remainder(60))}';
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final voiceColor = EnhancedSongDatabase.getVoiceTypeColor(widget.song.voiceType);
-    
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('${widget.song.title} - Karaoke'),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 0,
-        actions: [
-          if (isPlaying)
-            IconButton(
-              icon: Icon(Icons.stop, color: Colors.red),
-              onPressed: _stopPractice,
-            ),
-        ],
-      ),
-      body: Column(
+  // Paparan pitch/note user secara live
+  Widget _buildPitchDisplay() {
+    if (!isPlaying || currentDetectedNote.isEmpty || currentSegment == null) return SizedBox.shrink();
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 18),
+      child: Column(
         children: [
-          // Header with song info
-          Container(
-            padding: EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFFF8F9FA), Colors.white],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [voiceColor, voiceColor.withOpacity(0.7)],
-                    ),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(Icons.mic, color: Colors.white, size: 24),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.song.title,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                      Text(
-                        '${widget.song.artist} • ${widget.song.voiceType}',
-                        style: TextStyle(color: Colors.grey[600], fontSize: 13),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: isPlaying 
-                        ? Color(0xFF4CAF50).withOpacity(0.1)
-                        : Colors.grey.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    isPlaying ? 'LIVE' : 'READY',
-                    style: TextStyle(
-                      color: isPlaying ? Color(0xFF4CAF50) : Colors.grey[600],
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
+          Text('Your Voice', style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+          SizedBox(height: 4),
+          Text(
+            currentDetectedNote,
+            style: TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.bold,
+              color: currentFeedbackColor,
+              letterSpacing: 2,
             ),
           ),
-
-          // Progress indicator
-          if (isPlaying) ...[
-            SizedBox(height: 16),
-            _buildProgressIndicator(),
-          ],
-
-          // Current lyrics display
-          SizedBox(height: 20),
-          if (isPlaying && !showInstructions)
-            _buildLyricsDisplay(),
-
-          // Waveform visualization
-          if (isPlaying && isRecording)
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              height: 100,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    currentFeedbackColor.withOpacity(0.1),
-                    currentFeedbackColor.withOpacity(0.05),
-                  ],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: currentFeedbackColor.withOpacity(0.3)),
-              ),
-              child: Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(waveformData.length, (index) {
-                    final height = (waveformData[index].abs() * 40) + 8;
-                    return Container(
-                      width: 3,
-                      height: height,
-                      margin: EdgeInsets.symmetric(horizontal: 1),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [currentFeedbackColor, currentFeedbackColor.withOpacity(0.6)],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                        ),
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    );
-                  }),
-                ),
-              ),
-            ),
-
-          // Detected pitch display
-          if (isPlaying && currentDetectedNote.isNotEmpty && currentSegment != null)
-            Container(
-              padding: EdgeInsets.symmetric(vertical: 16),
-              child: Column(
-                children: [
-                  Text(
-                    'Your Voice',
-                    style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    currentDetectedNote,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: currentFeedbackColor,
-                    ),
-                  ),
-                  Text(
-                    '${currentDetectedFrequency.toStringAsFixed(1)} Hz',
-                    style: TextStyle(color: Colors.grey[500], fontSize: 11),
-                  ),
-                  SizedBox(height: 8),
-                  Container(
-                    margin: EdgeInsets.symmetric(horizontal: 40),
-                    child: LinearProgressIndicator(
-                      value: currentAccuracy,
-                      backgroundColor: Colors.grey[300],
-                      valueColor: AlwaysStoppedAnimation<Color>(currentFeedbackColor),
-                    ),
-                  ),
-                  Text(
-                    'Accuracy: ${(currentAccuracy * 100).toInt()}%',
-                    style: TextStyle(
-                      color: currentFeedbackColor,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-          // Main control area
-          Expanded(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (showInstructions) ...[
-                    // Instructions
-                    Container(
-                      margin: EdgeInsets.symmetric(horizontal: 24),
-                      padding: EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            voiceColor.withOpacity(0.1),
-                            voiceColor.withOpacity(0.05),
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: voiceColor.withOpacity(0.3)),
-                      ),
-                      child: Column(
-                        children: [
-                          Icon(Icons.queue_music, color: voiceColor, size: 48),
-                          SizedBox(height: 16),
-                          Text(
-                            'Karaoke Mode',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                          SizedBox(height: 16),
-                          Text(
-                            '• Full lyrics will appear with timing\n'
-                            '• Sing along with the music\n'
-                            '• Green = perfect pitch, Red = adjust\n'
-                            '• Detailed analysis after completion',
-                            style: TextStyle(
-                              color: Colors.grey[700],
-                              fontSize: 14,
-                              height: 1.5,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ] else ...[
-                    // Main karaoke button
-                    GestureDetector(
-                      onTap: isPlaying ? _stopPractice : null,
-                      child: Container(
-                        width: 120,
-                        height: 120,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: LinearGradient(
-                            colors: isPlaying
-                                ? [Color(0xFFF44336), Color(0xFFD32F2F)]
-                                : [Color(0xFF4CAF50), Color(0xFF2E7D32)],
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: (isPlaying ? Color(0xFFF44336) : Color(0xFF4CAF50)).withOpacity(0.3),
-                              blurRadius: 20,
-                              spreadRadius: isPlaying ? 8 : 0,
-                            ),
-                          ],
-                        ),
-                        child: Icon(
-                          isPlaying ? Icons.stop : Icons.mic,
-                          color: Colors.white,
-                          size: 50,
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
+          Text(
+            '${currentDetectedFrequency.toStringAsFixed(1)} Hz',
+            style: TextStyle(color: Colors.grey[500], fontSize: 13),
+          ),
+          SizedBox(height: 10),
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: 40),
+            child: LinearProgressIndicator(
+              value: currentAccuracy,
+              backgroundColor: Colors.grey[300],
+              valueColor: AlwaysStoppedAnimation<Color>(currentFeedbackColor),
+              minHeight: 8,
             ),
           ),
-
-          // Bottom feedback and controls
-          Container(
-            padding: EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.white, Color(0xFFF8F9FA)],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
-            child: Column(
-              children: [
-                Text(
-                  currentFeedbackText,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: currentFeedbackColor,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                if (showInstructions) ...[
-                  SizedBox(height: 16),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton.icon(
-                      onPressed: isInitialized ? _startKaraokePractice : null,
-                      icon: Icon(Icons.play_arrow, color: Colors.white),
-                      label: Text(
-                        'Start Karaoke',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: voiceColor,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ],
+          Text(
+            'Accuracy: ${(currentAccuracy * 100).toInt()}%',
+            style: TextStyle(
+              color: currentFeedbackColor,
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ],
       ),
     );
   }
+
+  @override
+  Widget build(BuildContext context) {
+    final voiceColor = EnhancedSongDatabase.getVoiceTypeColor(widget.song.voiceType);
+    
+    return WillPopScope(
+      onWillPop: () async {
+        _stopPractice();
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('${widget.song.title} - Karaoke'),
+          centerTitle: true,
+          backgroundColor: Colors.white,
+          elevation: 0,
+          actions: [
+            if (isPlaying)
+              IconButton(
+                icon: Icon(Icons.stop, color: Colors.red),
+                onPressed: _stopPractice,
+              ),
+          ],
+        ),
+        body: Column(
+          children: [
+            // Header with song info
+            Container(
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFFF8F9FA), Colors.white],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [voiceColor, voiceColor.withOpacity(0.7)],
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(Icons.mic, color: Colors.white, size: 24),
+                  ),
+                  SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.song.title,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Text(
+                          '${widget.song.artist} • ${widget.song.voiceType}',
+                          style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: isPlaying 
+                          ? Color(0xFF4CAF50).withOpacity(0.1)
+                          : Colors.grey.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      isPlaying ? 'LIVE' : 'READY',
+                      style: TextStyle(
+                        color: isPlaying ? Color(0xFF4CAF50) : Colors.grey[600],
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Progress indicator
+            if (isPlaying) ...[
+              SizedBox(height: 16),
+              _buildProgressIndicator(),
+            ],
+
+            // Current lyrics display
+            SizedBox(height: 20),
+            if (isPlaying && !showInstructions)
+              _buildLyricsDisplay(),
+
+            // Waveform visualization
+            if (isPlaying && isRecording)
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                height: 100,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      currentFeedbackColor.withOpacity(0.1),
+                      currentFeedbackColor.withOpacity(0.05),
+                    ],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: currentFeedbackColor.withOpacity(0.3)),
+                ),
+                child: Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(waveformData.length, (index) {
+                      final height = (waveformData[index].abs() * 40) + 8;
+                      return Container(
+                        width: 3,
+                        height: height,
+                        margin: EdgeInsets.symmetric(horizontal: 1),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [currentFeedbackColor, currentFeedbackColor.withOpacity(0.6)],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      );
+                    }),
+                  ),
+                ),
+              ),
+
+            // REAL detected pitch display
+            if (isPlaying && currentDetectedNote.isNotEmpty && currentSegment != null)
+              _buildPitchDisplay(),
+
+            // Main control area
+            Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (showInstructions) ...[
+                      // Instructions
+                      Container(
+                        margin: EdgeInsets.symmetric(horizontal: 24),
+                        padding: EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              voiceColor.withOpacity(0.1),
+                              voiceColor.withOpacity(0.05),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: voiceColor.withOpacity(0.3)),
+                        ),
+                        child: Column(
+                          children: [
+                            Icon(Icons.queue_music, color: voiceColor, size: 48),
+                            SizedBox(height: 16),
+                            Text(
+                              'Real Voice Karaoke',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            SizedBox(height: 16),
+                            Text(
+                              '• REAL voice detection & pitch analysis\n'
+                              '• Live accuracy feedback based on your voice\n'
+                              '• Green = perfect pitch, Red = adjust\n'
+                              '• Professional analysis after completion',
+                              style: TextStyle(
+                                color: Colors.grey[700],
+                                fontSize: 14,
+                                height: 1.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ] else ...[
+                      // Main karaoke button
+                      GestureDetector(
+                        onTap: isPlaying ? _stopPractice : null,
+                        child: Container(
+                          width: 120,
+                          height: 120,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: LinearGradient(
+                              colors: isPlaying
+                                  ? [Color(0xFFF44336), Color(0xFFD32F2F)]
+                                  : [Color(0xFF4CAF50), Color(0xFF2E7D32)],
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: (isPlaying ? Color(0xFFF44336) : Color(0xFF4CAF50)).withOpacity(0.3),
+                                blurRadius: 20,
+                                spreadRadius: isPlaying ? 8 : 0,
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            isPlaying ? Icons.stop : Icons.mic,
+                            color: Colors.white,
+                            size: 50,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+
+            // Bottom feedback and controls
+            Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.white, Color(0xFFF8F9FA)],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+              child: Column(
+                children: [
+                  Text(
+                    currentFeedbackText,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: currentFeedbackColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  if (showInstructions) ...[
+                    SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton.icon(
+                        onPressed: isInitialized ? _startKaraokePractice : null,
+                        icon: Icon(Icons.play_arrow, color: Colors.white),
+                        label: Text(
+                          'Start Real Voice Karaoke',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: voiceColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
-// Comprehensive Analysis Screen
+// Analysis Screen remains the same but now shows REAL data
 class KaraokeAnalysisScreen extends StatelessWidget {
   final EnhancedSongData song;
   final List<PerformanceData> performanceHistory;
@@ -1011,7 +1168,7 @@ class KaraokeAnalysisScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final voiceColor = EnhancedSongDatabase.getVoiceTypeColor(song.voiceType);
     
-    // Calculate statistics
+    // Calculate REAL statistics
     Map<LyricSegment, List<PerformanceData>> segmentPerformance = {};
     for (var performance in performanceHistory) {
       if (!segmentPerformance.containsKey(performance.segment)) {
@@ -1022,7 +1179,6 @@ class KaraokeAnalysisScreen extends StatelessWidget {
 
     List<Widget> analysisCards = [];
     
-    // Build analysis for each segment
     segmentPerformance.forEach((segment, performances) {
       double avgAccuracy = performances.map((p) => p.accuracy).reduce((a, b) => a + b) / performances.length;
       bool needsImprovement = avgAccuracy < 0.7;
@@ -1080,7 +1236,7 @@ class KaraokeAnalysisScreen extends StatelessWidget {
               if (needsImprovement) ...[
                 SizedBox(height: 8),
                 Text(
-                  '💡 Practice tip: Listen carefully to this part and try to match the pitch more precisely',
+                  '💡 Practice tip: Focus on matching this pitch more precisely',
                   style: TextStyle(
                     color: Color(0xFFD84315),
                     fontSize: 12,
@@ -1096,7 +1252,7 @@ class KaraokeAnalysisScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Performance Analysis'),
+        title: Text('REAL Voice Analysis'),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
@@ -1106,7 +1262,6 @@ class KaraokeAnalysisScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Overall Results Header
             Container(
               padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -1135,7 +1290,7 @@ class KaraokeAnalysisScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Karaoke Analysis Complete',
+                              'REAL Voice Analysis Complete',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -1143,7 +1298,7 @@ class KaraokeAnalysisScreen extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              'Detailed breakdown of your performance',
+                              'Based on your actual voice detection',
                               style: TextStyle(color: Colors.grey[600], fontSize: 13),
                             ),
                           ],
@@ -1156,7 +1311,7 @@ class KaraokeAnalysisScreen extends StatelessWidget {
                     children: [
                       Expanded(
                         child: _buildStatCard(
-                          'Overall Score',
+                          'Real Score',
                           '${(overallAccuracy * 100).toInt()}%',
                           overallAccuracy > 0.8 ? Color(0xFF4CAF50) : 
                           overallAccuracy > 0.6 ? Color(0xFFFF9800) : Color(0xFFF44336),
@@ -1186,9 +1341,8 @@ class KaraokeAnalysisScreen extends StatelessWidget {
             
             SizedBox(height: 24),
             
-            // Section-by-section analysis
             Text(
-              'Lyric-by-Lyric Analysis',
+              'Real Voice Analysis by Lyric',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -1197,7 +1351,7 @@ class KaraokeAnalysisScreen extends StatelessWidget {
             ),
             SizedBox(height: 12),
             Text(
-              'Each section shows your pitch accuracy. Focus on red sections for improvement.',
+              'Based on actual voice detection. Red sections need more practice.',
               style: TextStyle(color: Colors.grey[600], fontSize: 14),
             ),
             SizedBox(height: 16),
@@ -1206,53 +1360,6 @@ class KaraokeAnalysisScreen extends StatelessWidget {
             
             SizedBox(height: 24),
             
-            // Improvement suggestions
-            Container(
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Color(0xFFF3E5F5),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Color(0xFF9C27B0).withOpacity(0.3)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.lightbulb, color: Color(0xFF9C27B0)),
-                      SizedBox(width: 8),
-                      Text(
-                        'Improvement Tips',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF9C27B0),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 12),
-                  if (overallAccuracy < 0.5)
-                    Text('🎯 Focus on pitch matching - practice humming along first\n'
-                         '📻 Listen to the original song more to internalize the melody\n'
-                         '🎵 Start with slower songs to build accuracy',
-                         style: TextStyle(color: Colors.grey[700], height: 1.4))
-                  else if (overallAccuracy < 0.8)
-                    Text('🎯 You\'re doing well! Focus on the red sections above\n'
-                         '🎵 Practice difficult parts slowly and repeat\n'
-                         '📈 Try more challenging songs to improve further',
-                         style: TextStyle(color: Colors.grey[700], height: 1.4))
-                  else
-                    Text('🌟 Excellent performance! You have great pitch control\n'
-                         '🎭 Try adding expression and dynamics to your singing\n'
-                         '🎤 Challenge yourself with more complex songs',
-                         style: TextStyle(color: Colors.grey[700], height: 1.4)),
-                ],
-              ),
-            ),
-            
-            SizedBox(height: 24),
-            
-            // Action buttons
             Row(
               children: [
                 Expanded(

@@ -415,7 +415,8 @@ class _EnhancedSongPreviewScreenState extends State<EnhancedSongPreviewScreen> {
           currentPosition = Duration.zero;
         });
       } else {
-        await _player.play(AssetSource(widget.song.accompanimentPath));
+        // Guna previewPath untuk preview
+        await _player.play(AssetSource(widget.song.previewPath));
         setState(() {
           isPlaying = true;
         });
