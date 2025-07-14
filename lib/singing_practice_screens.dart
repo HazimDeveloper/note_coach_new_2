@@ -3,14 +3,423 @@ import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:note_coach_new_2/singing_practice_screen.dart';
 
+// Updated Song Selection Screen with Enhanced Karaoke Integration
+class UpdatedSongSelectionScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final songs = PitchDetectionSongDatabase.getSongs();
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Row(
+          children: [
+            Icon(Icons.music_note, color: Color(0xFF2196F3)),
+            SizedBox(width: 8),
+            Text('NOTECOACH'),
+          ],
+        ),
+        centerTitle: true,
+      ),
+      body: Column(
+        children: [
+          // Enhanced Header Section
+          Container(
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFFF8F9FA), Colors.white],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Color(0xFF2196F3), Color(0xFF1976D2)],
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.queue_music,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Karaoke Practice',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            'Sing along with full songs • Real-time analysis',
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16),
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Color(0xFF4CAF50).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: Color(0xFF4CAF50).withOpacity(0.3),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.music_note,
+                            color: Color(0xFF4CAF50),
+                            size: 16,
+                          ),
+                          SizedBox(width: 4),
+                          Text(
+                            '${songs.length} Full Songs',
+                            style: TextStyle(
+                              color: Color(0xFF4CAF50),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Color(0xFF2196F3).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: Color(0xFF2196F3).withOpacity(0.3),
+                        ),
+                      ),
+                      child: Text(
+                        'Karaoke Mode',
+                        style: TextStyle(
+                          color: Color(0xFF2196F3),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Color(0xFFFF9800).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: Color(0xFFFF9800).withOpacity(0.3),
+                        ),
+                      ),
+                      child: Text(
+                        'Full Analysis',
+                        style: TextStyle(
+                          color: Color(0xFFFF9800),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          // Featured Song Section
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            child: Row(
+              children: [
+                Text(
+                  'Featured Songs',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                Spacer(),
+                Text(
+                  'Swipe for more →',
+                  style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+
+          // Songs List
+          Expanded(
+            child: ListView.builder(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              itemCount: songs.length,
+              itemBuilder: (context, index) {
+                final song = songs[index];
+                final voiceColor = PitchDetectionSongDatabase.getVoiceTypeColor(
+                  song.voiceType,
+                );
+
+                return Container(
+                  margin: EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.circular(16),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                EnhancedSongPreviewScreen(song: song),
+                          ),
+                        );
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Row(
+                          children: [
+                            // Enhanced Album Art
+                            Container(
+                              width: 70,
+                              height: 70,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    voiceColor,
+                                    voiceColor.withOpacity(0.7),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: voiceColor.withOpacity(0.3),
+                                    blurRadius: 8,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Stack(
+                                children: [
+                                  Center(
+                                    child: Icon(
+                                      Icons.music_note,
+                                      color: Colors.white,
+                                      size: 32,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    bottom: 4,
+                                    right: 4,
+                                    child: Container(
+                                      padding: EdgeInsets.all(4),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(
+                                        Icons.queue_music,
+                                        color: voiceColor,
+                                        size: 12,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: 16),
+
+                            // Enhanced Song Info
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    song.title,
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    song.artist,
+                                    style: TextStyle(
+                                      color: Colors.grey[600],
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  SizedBox(height: 8),
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: voiceColor.withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                          border: Border.all(
+                                            color: voiceColor.withOpacity(0.3),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          song.voiceType,
+                                          style: TextStyle(
+                                            color: voiceColor,
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: 8),
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey.withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          '${song.duration.inMinutes}:${(song.duration.inSeconds % 60).toString().padLeft(2, '0')}',
+                                          style: TextStyle(
+                                            color: Colors.grey[600],
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: 8),
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Color(
+                                            0xFF4CAF50,
+                                          ).withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          '${song.lyricSegments.length} parts',
+                                          style: TextStyle(
+                                            color: Color(0xFF4CAF50),
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            // Enhanced Play Icon
+                            Container(
+                              padding: EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    voiceColor.withOpacity(0.2),
+                                    voiceColor.withOpacity(0.1),
+                                  ],
+                                ),
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: voiceColor.withOpacity(0.3),
+                                ),
+                              ),
+                              child: Icon(
+                                Icons.play_arrow,
+                                color: voiceColor,
+                                size: 24,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 // Enhanced Song Preview Screen
 class EnhancedSongPreviewScreen extends StatefulWidget {
-  final SimpleSongData song;
+  final EnhancedSongWithPitchData song;
 
-  const EnhancedSongPreviewScreen({Key? key, required this.song}) : super(key: key);
+  const EnhancedSongPreviewScreen({Key? key, required this.song})
+    : super(key: key);
 
   @override
-  _EnhancedSongPreviewScreenState createState() => _EnhancedSongPreviewScreenState();
+  _EnhancedSongPreviewScreenState createState() =>
+      _EnhancedSongPreviewScreenState();
 }
 
 class _EnhancedSongPreviewScreenState extends State<EnhancedSongPreviewScreen> {
@@ -61,7 +470,6 @@ class _EnhancedSongPreviewScreenState extends State<EnhancedSongPreviewScreen> {
           currentPosition = Duration.zero;
         });
       } else {
-        // Guna previewPath untuk preview
         await _player.play(AssetSource(widget.song.previewPath));
         setState(() {
           isPlaying = true;
@@ -80,7 +488,9 @@ class _EnhancedSongPreviewScreenState extends State<EnhancedSongPreviewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final voiceColor = SimpleSongDatabase.getVoiceTypeColor(widget.song.voiceType);
+    final voiceColor = PitchDetectionSongDatabase.getVoiceTypeColor(
+      widget.song.voiceType,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -154,7 +564,7 @@ class _EnhancedSongPreviewScreenState extends State<EnhancedSongPreviewScreen> {
                   ),
                 ),
                 SizedBox(height: 20),
-                
+
                 // Song Title & Artist
                 Text(
                   widget.song.title,
@@ -168,19 +578,19 @@ class _EnhancedSongPreviewScreenState extends State<EnhancedSongPreviewScreen> {
                 SizedBox(height: 8),
                 Text(
                   widget.song.artist,
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 16,
-                  ),
+                  style: TextStyle(color: Colors.grey[600], fontSize: 16),
                 ),
                 SizedBox(height: 16),
-                
+
                 // Enhanced Voice Type Badge
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [voiceColor.withOpacity(0.2), voiceColor.withOpacity(0.1)],
+                      colors: [
+                        voiceColor.withOpacity(0.2),
+                        voiceColor.withOpacity(0.1),
+                      ],
                     ),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: voiceColor.withOpacity(0.3)),
@@ -251,7 +661,7 @@ class _EnhancedSongPreviewScreenState extends State<EnhancedSongPreviewScreen> {
                     ),
                   ),
                   SizedBox(height: 12),
-                  
+
                   // Enhanced Song Stats
                   Row(
                     children: [
@@ -271,15 +681,15 @@ class _EnhancedSongPreviewScreenState extends State<EnhancedSongPreviewScreen> {
                       SizedBox(width: 12),
                       _buildStatCard(
                         'Segments',
-                        '${widget.song.lyrics.length}',
+                        '${widget.song.lyricSegments.length}',
                         Icons.list,
                         Color(0xFFFF9800),
                       ),
                     ],
                   ),
-                  
+
                   SizedBox(height: 24),
-                  
+
                   // Lyrics Preview
                   Text(
                     'Lyrics Preview',
@@ -298,7 +708,9 @@ class _EnhancedSongPreviewScreenState extends State<EnhancedSongPreviewScreen> {
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: widget.song.lyrics.take(4).map((segment) {
+                      children: widget.song.lyricSegments.take(4).map((
+                        segment,
+                      ) {
                         return Padding(
                           padding: EdgeInsets.only(bottom: 8),
                           child: Row(
@@ -327,9 +739,9 @@ class _EnhancedSongPreviewScreenState extends State<EnhancedSongPreviewScreen> {
                       }).toList(),
                     ),
                   ),
-                  
+
                   SizedBox(height: 24),
-                  
+
                   // Enhanced Karaoke Features
                   Text(
                     'Karaoke Features',
@@ -344,22 +756,47 @@ class _EnhancedSongPreviewScreenState extends State<EnhancedSongPreviewScreen> {
                     padding: EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [Color(0xFF4CAF50).withOpacity(0.1), Colors.white],
+                        colors: [
+                          Color(0xFF4CAF50).withOpacity(0.1),
+                          Colors.white,
+                        ],
                       ),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Color(0xFF4CAF50).withOpacity(0.3)),
+                      border: Border.all(
+                        color: Color(0xFF4CAF50).withOpacity(0.3),
+                      ),
                     ),
                     child: Column(
                       children: [
-                        _buildFeatureRow(Icons.queue_music, 'Full song karaoke with timing', Color(0xFF4CAF50)),
+                        _buildFeatureRow(
+                          Icons.queue_music,
+                          'Full song karaoke with timing',
+                          Color(0xFF4CAF50),
+                        ),
                         SizedBox(height: 8),
-                        _buildFeatureRow(Icons.mic, 'Real-time pitch detection & feedback', Color(0xFF2196F3)),
+                        _buildFeatureRow(
+                          Icons.mic,
+                          'Real-time pitch detection & feedback',
+                          Color(0xFF2196F3),
+                        ),
                         SizedBox(height: 8),
-                        _buildFeatureRow(Icons.analytics, 'Comprehensive lyric-by-lyric analysis', Color(0xFFFF9800)),
+                        _buildFeatureRow(
+                          Icons.analytics,
+                          'Comprehensive lyric-by-lyric analysis',
+                          Color(0xFFFF9800),
+                        ),
                         SizedBox(height: 8),
-                        _buildFeatureRow(Icons.track_changes, 'Visual accuracy indicators', Color(0xFF9C27B0)),
+                        _buildFeatureRow(
+                          Icons.track_changes,
+                          'Visual accuracy indicators',
+                          Color(0xFF9C27B0),
+                        ),
                         SizedBox(height: 8),
-                        _buildFeatureRow(Icons.school, 'Personalized improvement tips', Color(0xFFE91E63)),
+                        _buildFeatureRow(
+                          Icons.school,
+                          'Personalized improvement tips',
+                          Color(0xFFE91E63),
+                        ),
                       ],
                     ),
                   ),
@@ -382,7 +819,8 @@ class _EnhancedSongPreviewScreenState extends State<EnhancedSongPreviewScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => SimplifiedSingingPracticeScreen(song: widget.song),
+                      builder: (context) =>
+                          EnhancedSingingPracticeWithPitch(song: widget.song),
                     ),
                   );
                 },
@@ -437,7 +875,12 @@ class _EnhancedSongPreviewScreenState extends State<EnhancedSongPreviewScreen> {
     );
   }
 
-  Widget _buildStatCard(String label, String value, IconData icon, Color color) {
+  Widget _buildStatCard(
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Expanded(
       child: Container(
         padding: EdgeInsets.all(12),
@@ -477,46 +920,5 @@ class _EnhancedSongPreviewScreenState extends State<EnhancedSongPreviewScreen> {
   String _formatDuration(Duration duration) {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
     return '${twoDigits(duration.inMinutes)}:${twoDigits(duration.inSeconds.remainder(60))}';
-  }
-}
-
-// Add UpdatedSongSelectionScreen here, using SimpleSongData from singing_practice_screen.dart
-class UpdatedSongSelectionScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final songs = SimpleSongDatabase.getSongs();
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Select Song - Simplified Version'),
-      ),
-      body: ListView.builder(
-        padding: EdgeInsets.all(16),
-        itemCount: songs.length,
-        itemBuilder: (context, index) {
-          final song = songs[index];
-          return Card(
-            margin: EdgeInsets.only(bottom: 12),
-            child: ListTile(
-              leading: CircleAvatar(
-                backgroundColor: SimpleSongDatabase.getVoiceTypeColor(song.voiceType),
-                child: Icon(Icons.music_note, color: Colors.white),
-              ),
-              title: Text(song.title),
-              subtitle: Text('${song.artist} • ${song.voiceType} • ${song.duration.inSeconds}s'),
-              trailing: Icon(Icons.play_arrow),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => EnhancedSongPreviewScreen(song: song),
-                  ),
-                );
-              },
-            ),
-          );
-        },
-      ),
-    );
   }
 }

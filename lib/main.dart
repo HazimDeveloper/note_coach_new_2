@@ -8,7 +8,7 @@ import 'package:note_coach_new_2/pitch_lesson_step2.dart';
 import 'package:note_coach_new_2/pitch_lesson_step3.dart';
 import 'package:note_coach_new_2/singing_practice_screen.dart';
 import 'package:note_coach_new_2/vocal_range_detector_screen.dart';
-import 'package:note_coach_new_2/singing_practice_screens.dart'; // Import singing practice
+import 'package:note_coach_new_2/singing_practice_screens.dart';
 
 void main() {
   runApp(NoteCoachApp());
