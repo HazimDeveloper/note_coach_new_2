@@ -969,7 +969,7 @@ class PitchDetectionSongDatabase {
           TimedLyricSegment(
             text: "Kasihmu",
             startTime: 1.0,
-            endTime: 3.0,
+            endTime: 4.0,
             targetFrequency: 311.13, // Eb4
             targetNote: "Eb4",
             isHighlight: true,
@@ -999,8 +999,8 @@ class PitchDetectionSongDatabase {
           ),
           TimedLyricSegment(
             text: "terus hidup",
-            startTime: 3.0,
-            endTime: 6.0,
+            startTime: 4.0,
+            endTime: 7.0,
             targetFrequency: 277.18, // Db4
             targetNote: "Db4",
             isHighlight: true,
@@ -1039,8 +1039,8 @@ class PitchDetectionSongDatabase {
           // Ja Ngan Ma Ti Ra Sa I Tu
           TimedLyricSegment(
             text: "Jangan mati rasa",
-            startTime: 6.0,
-            endTime: 9.0,
+            startTime: 7.0,
+            endTime: 11.0,
             targetFrequency: 349.23, // F4
             targetNote: "F4",
             isHighlight: true,
@@ -1091,8 +1091,8 @@ class PitchDetectionSongDatabase {
           ),
           TimedLyricSegment(
             text: "itu",
-            startTime: 9.0,
-            endTime: 12.0,
+            startTime: 11.0,
+            endTime: 16.0,
             targetFrequency: 392.00, // G4
             targetNote: "G4",
             isHighlight: true,
@@ -1117,8 +1117,8 @@ class PitchDetectionSongDatabase {
           // Ba Gai Ma Na
           TimedLyricSegment(
             text: "Bagaimana",
-            startTime: 12.0,
-            endTime: 15.0,
+            startTime: 16.0,
+            endTime: 24.0,
             targetFrequency: 415.30, // Ab4
             targetNote: "Ab4",
             isHighlight: true,
@@ -1157,8 +1157,8 @@ class PitchDetectionSongDatabase {
           // Ha Rus Ku Ja La ni Tan Pa Ka Mu
           TimedLyricSegment(
             text: "harus ku",
-            startTime: 15.0,
-            endTime: 18.0,
+            startTime: 24.0,
+            endTime: 26.0,
             targetFrequency: 622.25, // Eb5
             targetNote: "Eb5",
             isHighlight: true,
@@ -1188,8 +1188,8 @@ class PitchDetectionSongDatabase {
           ),
           TimedLyricSegment(
             text: "jalani",
-            startTime: 18.0,
-            endTime: 21.0,
+            startTime: 26.0,
+            endTime: 28.0,
             targetFrequency: 554.37, // Db5
             targetNote: "Db5",
             isHighlight: true,
@@ -1219,8 +1219,8 @@ class PitchDetectionSongDatabase {
           ),
           TimedLyricSegment(
             text: "tanpa kamu",
-            startTime: 21.0,
-            endTime: 24.0,
+            startTime: 28.0,
+            endTime: 31.0,
             targetFrequency: 523.25, // C5
             targetNote: "C5",
             isHighlight: true,
