@@ -320,6 +320,11 @@ class _ImprovedVocalRangeDetectorState extends State<ImprovedVocalRangeDetector>
   int recordingDuration = 5; // 5 seconds for better accuracy
 
   String? sustainedNoteResult;
+  bool isListening = false;
+  double liveFrequency = 0.0;
+  String liveNote = '';
+  String liveVoiceType = '';
+  CustomSustainedNoteDetectorController? detectorController;
 
   @override
   void initState() {
@@ -331,6 +336,25 @@ class _ImprovedVocalRangeDetectorState extends State<ImprovedVocalRangeDetector>
     );
     pulseAnimation = Tween<double>(begin: 0.9, end: 1.1).animate(
       CurvedAnimation(parent: pulseController!, curve: Curves.easeInOut),
+    );
+    detectorController = CustomSustainedNoteDetectorController(
+      onLiveUpdate: (freq, note, voiceType) {
+        setState(() {
+          liveFrequency = freq;
+          liveNote = note;
+          liveVoiceType = voiceType;
+        });
+      },
+      onSustainedNote: (note, frequency, voiceType) {
+        setState(() {
+          sustainedNoteResult = '$note (${frequency.toStringAsFixed(1)} Hz) - $voiceType';
+        });
+      },
+      onListeningChanged: (listening) {
+        setState(() {
+          isListening = listening;
+        });
+      },
     );
   }
 
@@ -1093,6 +1117,7 @@ class _ImprovedVocalRangeDetectorState extends State<ImprovedVocalRangeDetector>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: BackButton(),
         title: Row(
           children: [
             Icon(Icons.music_note, color: Color(0xFF2196F3)),
@@ -1100,351 +1125,163 @@ class _ImprovedVocalRangeDetectorState extends State<ImprovedVocalRangeDetector>
             Text('NOTECOACH'),
           ],
         ),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 0,
+        centerTitle: false,
       ),
-      body: Column(
-        children: [
-          // Professional Header
-          Container(
-            padding: EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFFF8F9FA), Colors.white],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Color(0xFF2196F3), Color(0xFF1976D2)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(Icons.graphic_eq, color: Colors.white, size: 24),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Professional Vocal Analysis',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        'Studio-grade pitch detection • Real voice analysis',
-                        style: TextStyle(color: Colors.grey[600], fontSize: 13),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Activity Section
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  getActivityTitle(),
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    height: 1.4,
-                  ),
-                ),
-                SizedBox(height: 12),
-                Row(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: isRecording 
-                            ? Color(0xFF2196F3).withOpacity(0.1)
-                            : isAnalyzing 
-                                ? Colors.orange.withOpacity(0.1)
-                                : Colors.grey.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: isRecording 
-                              ? Color(0xFF2196F3)
-                              : isAnalyzing 
-                                  ? Colors.orange
-                                  : Colors.grey,
-                          width: 1,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            isRecording ? Icons.fiber_manual_record : 
-                            isAnalyzing ? Icons.analytics :
-                            waitingForUserToStart ? Icons.play_arrow : Icons.mic_none,
-                            color: isRecording ? Color(0xFF2196F3) : 
-                                   isAnalyzing ? Colors.orange :
-                                   waitingForUserToStart ? Color(0xFF4CAF50) : Colors.grey[600],
-                            size: 14,
-                          ),
-                          SizedBox(width: 4),
-                          Text(
-                            isRecording ? 'Recording... ${recordingCountdown}s' : 
-                            isAnalyzing ? 'Analyzing...' : 
-                            waitingForUserToStart ? 'Ready to start' : 'Standby',
-                            style: TextStyle(
-                              color: isRecording ? Color(0xFF2196F3) : 
-                                     isAnalyzing ? Colors.orange :
-                                     waitingForUserToStart ? Color(0xFF4CAF50) : Colors.grey[600],
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    if (confidenceScore > 0) ...[
-                      SizedBox(width: 12),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Color(0xFF4CAF50).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          'Confidence: ${(confidenceScore * 100).toInt()}%',
-                          style: TextStyle(
-                            color: Color(0xFF4CAF50),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          // Waveform Visualization
-          if (isRecording || isAnalyzing)
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Header
             Container(
-              margin: EdgeInsets.symmetric(horizontal: 20),
-              height: 120,
+              padding: EdgeInsets.all(16),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    (isAnalyzing ? Colors.orange : Color(0xFF2196F3)).withOpacity(0.1),
-                    (isAnalyzing ? Colors.orange : Color(0xFF2196F3)).withOpacity(0.05),
-                  ],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: (isAnalyzing ? Colors.orange : Color(0xFF2196F3)).withOpacity(0.3),
-                ),
+                color: Color(0xFFF5F5F5),
+                borderRadius: BorderRadius.circular(16),
               ),
-              child: Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(waveformData.length, (index) {
-                    final height = (waveformData[index].abs() * 50) + 12;
-                    return Container(
-                      width: 3,
-                      height: height,
-                      margin: EdgeInsets.symmetric(horizontal: 1.5),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            isAnalyzing ? Colors.orange : Color(0xFF2196F3),
-                            (isAnalyzing ? Colors.orange : Color(0xFF2196F3)).withOpacity(0.6),
-                          ],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                        ),
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    );
-                  }),
-                ),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    backgroundColor: Color(0xFF2196F3),
+                    child: Icon(Icons.graphic_eq, color: Colors.white),
+                    radius: 28,
+                  ),
+                  SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Real-Time Voice Detection', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                        Text('Precise note detection • Live frequency analysis', style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
+            SizedBox(height: 24),
 
-          // Detected Note Display
-          if (detectedNote.isNotEmpty && !isRecording && !waitingForUserToStart)
+            // Status
             Container(
-              padding: EdgeInsets.symmetric(vertical: 24),
-              child: Column(
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    isAnalyzing ? 'Analyzing...' : 'Detected Note',
-                    style: TextStyle(
-                      color: Colors.grey[600], 
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
+                  Icon(Icons.mic, color: isListening ? Color(0xFF2196F3) : Colors.grey),
+                  SizedBox(width: 8),
+                  Text(isListening ? 'LISTENING' : 'READY', style: TextStyle(fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ),
+            SizedBox(height: 24),
+
+            // Live Frequency
+            Text('Live Frequency', style: TextStyle(color: Colors.grey[600], fontSize: 16)),
+            SizedBox(height: 8),
+            Text(
+              isListening ? '${liveFrequency.toStringAsFixed(1)} Hz' : '0.0 Hz',
+              style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+            ),
+            if (isListening && liveNote.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 4.0),
+                child: Text('Note: $liveNote', style: TextStyle(fontSize: 18, color: Color(0xFF2196F3), fontWeight: FontWeight.bold)),
+              ),
+
+            SizedBox(height: 24),
+
+            // Mic Button
+            GestureDetector(
+              onTap: () {
+                if (isListening) {
+                  detectorController?.stop?.call();
+                } else {
+                  detectorController?.start?.call();
+                }
+              },
+              child: Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: isListening ? Colors.red : Color(0xFF2196F3),
+                  shape: BoxShape.circle,
+                  boxShadow: [BoxShadow(color: Color(0xFF2196F3).withOpacity(0.2), blurRadius: 8)],
+                ),
+                child: Icon(Icons.mic, color: Colors.white, size: 40),
+              ),
+            ),
+            SizedBox(height: 8),
+            Text('Tap to ${isListening ? 'stop' : 'start'} voice detection', style: TextStyle(color: Colors.grey[600])),
+
+            if (sustainedNoteResult != null) ...[
+              SizedBox(height: 24),
+              Container(
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Color(0xFF4CAF50).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Color(0xFF4CAF50).withOpacity(0.3)),
+                ),
+                child: Column(
+                  children: [
+                    Icon(Icons.check_circle, color: Color(0xFF4CAF50)),
+                    SizedBox(height: 8),
+                    Text('Sustained Note Detected!', style: TextStyle(fontWeight: FontWeight.bold)),
+                    SizedBox(height: 4),
+                    Text(sustainedNoteResult!, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              ),
+            ],
+
+            SizedBox(height: 32),
+
+            // How it works
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.05), blurRadius: 4)],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('How it works:', style: TextStyle(fontWeight: FontWeight.bold)),
                   SizedBox(height: 8),
-                  Text(
-                    detectedNote,
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: detectedNote.contains('not') || detectedNote.contains('failed') 
-                          ? Colors.red 
-                          : isAnalyzing 
-                              ? Colors.orange
-                              : Color(0xFF2196F3),
-                    ),
-                  ),
-                  if (detectedFrequency > 0)
-                    Text(
-                      '${detectedFrequency.toStringAsFixed(1)} Hz',
-                      style: TextStyle(color: Colors.grey[600], fontSize: 15),
-                    ),
+                  Text('• Sing or hum any note clearly\n• See real-time frequency and note detection\n• Hold a note for 3+ seconds to get classification\n• System detects BARITONE, TENOR, or ALTO range', style: TextStyle(color: Colors.grey[700], fontSize: 13)),
                 ],
               ),
             ),
-
-          // Main Action Button
-          Expanded(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      if (currentStep == 'start') {
-                        prepareLowestTest();
-                      } else if (currentStep == 'lowest_ready') {
-                        startLowestTest();
-                      } else if (currentStep == 'highest_ready') {
-                        startHighestTest();
-                      } else if (isRecording) {
-                        stopRecording();
-                      } else if (isAnalyzing) {
-                        // Do nothing while analyzing
-                      } else if (detectedNote.contains('not') || detectedNote.contains('failed')) {
-                        if (currentStep.contains('lowest')) {
-                          prepareLowestTest();
-                        } else {
-                          prepareHighestTest();
-                        }
-                      }
-                    },
-                    child: AnimatedBuilder(
-                      animation: pulseAnimation!,
-                      builder: (context, child) {
-                        return Container(
-                          width: isRecording ? 140 * pulseAnimation!.value : 140,
-                          height: isRecording ? 140 * pulseAnimation!.value : 140,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: LinearGradient(
-                              colors: isAnalyzing 
-                                  ? [Colors.orange, Colors.deepOrange]
-                                  : waitingForUserToStart 
-                                      ? [Color(0xFF4CAF50), Color(0xFF2E7D32)]
-                                      : isRecording 
-                                          ? [Color(0xFF2196F3), Color(0xFF1976D2)]
-                                          : [Color(0xFFF5F5F5), Color(0xFFE0E0E0)],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: (isAnalyzing ? Colors.orange : 
-                                       waitingForUserToStart ? Color(0xFF4CAF50) :
-                                       isRecording ? Color(0xFF2196F3) : Colors.grey).withOpacity(0.3),
-                                blurRadius: isRecording ? 20 : 8,
-                                spreadRadius: isRecording ? 5 : 0,
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            isAnalyzing ? Icons.analytics : 
-                            (isRecording ? Icons.stop : Icons.mic),
-                            color: isAnalyzing || waitingForUserToStart || isRecording 
-                                ? Colors.white 
-                                : Color(0xFF2196F3),
-                            size: 60,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  SizedBox(height: 24),
-                  Text(
-                    currentStep == 'start' 
-                        ? 'Start Professional Analysis' 
-                        : waitingForUserToStart
-                            ? 'Tap when ready to record'
-                            : isAnalyzing
-                                ? 'Processing audio with professional algorithms...'
-                                : isRecording 
-                                    ? 'Recording... Tap to stop early' 
-                                    : detectedNote.contains('not') || detectedNote.contains('failed')
-                                        ? 'Tap to retry recording'
-                                        : 'Recording complete',
-                    style: TextStyle(
-                      color: Colors.grey[700], 
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // Professional Instruction Text
-          Container(
-            padding: EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.white, Color(0xFFF8F9FA)],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
-            child: Text(
-              getInstructionText(),
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[700],
-                height: 1.5,
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
 
-class CustomSustainedNoteDetector extends StatefulWidget {
+class CustomSustainedNoteDetectorController {
+  void Function()? start;
+  void Function()? stop;
+  final void Function(double freq, String note, String voiceType) onLiveUpdate;
   final void Function(String note, double frequency, String voiceType) onSustainedNote;
-  const CustomSustainedNoteDetector({required this.onSustainedNote});
+  final void Function(bool listening) onListeningChanged;
+  CustomSustainedNoteDetectorController({
+    required this.onLiveUpdate,
+    required this.onSustainedNote,
+    required this.onListeningChanged,
+  });
+}
+
+class CustomSustainedNoteDetector extends StatefulWidget {
+  final CustomSustainedNoteDetectorController? controller;
+  final void Function(String note, double frequency, String voiceType)? onSustainedNote;
+  const CustomSustainedNoteDetector({this.controller, this.onSustainedNote});
 
   @override
   State<CustomSustainedNoteDetector> createState() => _CustomSustainedNoteDetectorState();
@@ -1468,6 +1305,10 @@ class _CustomSustainedNoteDetectorState extends State<CustomSustainedNoteDetecto
   void initState() {
     super.initState();
     _requestPermissions();
+    if (widget.controller != null) {
+      widget.controller!.start = _startListening;
+      widget.controller!.stop = _stopListening;
+    }
   }
 
   @override
@@ -1499,6 +1340,7 @@ class _CustomSustainedNoteDetectorState extends State<CustomSustainedNoteDetecto
       sustainedStartTime = null;
       showingSustained = false;
     });
+    widget.controller?.onListeningChanged(true);
     final directory = await getTemporaryDirectory();
     audioFilePath = '${directory.path}/temp_audio_${DateTime.now().millisecondsSinceEpoch}.wav';
     if (await _recorder.hasPermission()) {
@@ -1525,6 +1367,7 @@ class _CustomSustainedNoteDetectorState extends State<CustomSustainedNoteDetecto
       sustainedStartTime = null;
       showingSustained = false;
     });
+    widget.controller?.onListeningChanged(false);
     analysisTimer?.cancel();
     sustainedTimer?.cancel();
     await _recorder.stop();
@@ -1565,6 +1408,7 @@ class _CustomSustainedNoteDetectorState extends State<CustomSustainedNoteDetecto
           currentNote = '';
           currentVoiceType = '';
         });
+        widget.controller?.onLiveUpdate(0.0, '', '');
       }
     } catch (e) {}
   }
@@ -1631,6 +1475,7 @@ class _CustomSustainedNoteDetectorState extends State<CustomSustainedNoteDetecto
         currentNote = noteData['note'];
         currentVoiceType = VocalRangeFrequencies.classifyVocalRange(frequency, frequency);
       });
+      widget.controller?.onLiveUpdate(frequency, currentNote, currentVoiceType);
       _checkSustainedNote(currentNote, frequency, currentVoiceType);
     } else {
       setState(() {
@@ -1639,6 +1484,7 @@ class _CustomSustainedNoteDetectorState extends State<CustomSustainedNoteDetecto
         sustainedNote = null;
         sustainedStartTime = null;
       });
+      widget.controller?.onLiveUpdate(0.0, '', '');
     }
   }
 
@@ -1655,7 +1501,10 @@ class _CustomSustainedNoteDetectorState extends State<CustomSustainedNoteDetecto
           setState(() {
             showingSustained = true;
           });
-          widget.onSustainedNote(note, frequency, voiceType);
+          if (widget.onSustainedNote != null) {
+            widget.onSustainedNote!(note, frequency, voiceType);
+          }
+          widget.controller?.onSustainedNote(note, frequency, voiceType);
         }
       });
     }
@@ -1663,36 +1512,7 @@ class _CustomSustainedNoteDetectorState extends State<CustomSustainedNoteDetecto
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton.icon(
-              onPressed: isListening ? _stopListening : _startListening,
-              icon: Icon(isListening ? Icons.stop : Icons.mic),
-              label: Text(isListening ? 'Stop' : 'Start'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: isListening ? Colors.red : Color(0xFF2196F3),
-              ),
-            ),
-            SizedBox(width: 16),
-            if (isListening && currentNote.isNotEmpty)
-              Text(
-                'Current: $currentNote',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-          ],
-        ),
-        if (!isListening && showingSustained && sustainedNote != null)
-          Padding(
-            padding: const EdgeInsets.only(top: 12.0),
-            child: Text(
-              'Sustained Note: $sustainedNote',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF4CAF50)),
-            ),
-          ),
-      ],
-    );
+    // The actual UI is handled by the parent widget.
+    return SizedBox.shrink();
   }
 }
