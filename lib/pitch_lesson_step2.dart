@@ -1,6 +1,14 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:note_coach_new_2/pitch_lesson_step3.dart';
+import 'realtime_voice_detector.dart';
+import 'dart:async';
+import 'dart:math';
+import 'dart:typed_data';
+import 'dart:io';
+import 'package:record/record.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:path_provider/path_provider.dart';
 
 // Pitch Lesson Step 2 - Listen to Different Pitches (White Theme)
 class PitchLessonStep2 extends StatefulWidget {
@@ -28,6 +36,7 @@ class _PitchLessonStep2State extends State<PitchLessonStep2> {
   };
 
   String? currentlyPlaying;
+  String? sustainedNoteResult;
 
   @override
   void dispose() {
@@ -240,6 +249,51 @@ class _PitchLessonStep2State extends State<PitchLessonStep2> {
             
             SizedBox(height: 32),
             
+            // Real-time Voice Type Detector
+            Text(
+              'Try singing or humming a note below to see your note if you hold it for 3 seconds:',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 16),
+            Container(
+              padding: EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Color(0xFFF5F5F5),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: CustomSustainedNoteDetector(
+                onSustainedNote: (note, frequency, voiceType) {
+                  setState(() {
+                    sustainedNoteResult = '$note (${frequency.toStringAsFixed(1)} Hz) - $voiceType';
+                  });
+                },
+              ),
+            ),
+            if (sustainedNoteResult != null) ...[
+              SizedBox(height: 16),
+              Container(
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Color(0xFF4CAF50).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Color(0xFF4CAF50).withOpacity(0.3)),
+                ),
+                child: Column(
+                  children: [
+                    Icon(Icons.check_circle, color: Color(0xFF4CAF50)),
+                    SizedBox(height: 8),
+                    Text('Sustained Note Detected!', style: TextStyle(fontWeight: FontWeight.bold)),
+                    SizedBox(height: 4),
+                    Text(sustainedNoteResult!, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              ),
+            ],
+            SizedBox(height: 32),
             // Navigation Buttons
             Row(
               children: [
@@ -372,5 +426,260 @@ class _PitchLessonStep2State extends State<PitchLessonStep2> {
         currentlyPlaying = null;
       });
     }
+  }
+}
+
+class CustomSustainedNoteDetector extends StatefulWidget {
+  final void Function(String note, double frequency, String voiceType) onSustainedNote;
+  const CustomSustainedNoteDetector({required this.onSustainedNote});
+
+  @override
+  State<CustomSustainedNoteDetector> createState() => _CustomSustainedNoteDetectorState();
+}
+
+class _CustomSustainedNoteDetectorState extends State<CustomSustainedNoteDetector> with TickerProviderStateMixin {
+  final AudioRecorder _recorder = AudioRecorder();
+  bool isListening = false;
+  bool hasPermission = false;
+  String? audioFilePath;
+  Timer? analysisTimer;
+  double currentFrequency = 0.0;
+  String currentNote = '';
+  String currentVoiceType = '';
+  String? sustainedNote;
+  DateTime? sustainedStartTime;
+  Timer? sustainedTimer;
+  bool showingSustained = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _requestPermissions();
+  }
+
+  @override
+  void dispose() {
+    _stopListening();
+    analysisTimer?.cancel();
+    sustainedTimer?.cancel();
+    if (audioFilePath != null && File(audioFilePath!).existsSync()) {
+      File(audioFilePath!).delete().catchError((_) {});
+    }
+    super.dispose();
+  }
+
+  Future<void> _requestPermissions() async {
+    final status = await Permission.microphone.request();
+    setState(() {
+      hasPermission = status == PermissionStatus.granted;
+    });
+  }
+
+  Future<void> _startListening() async {
+    if (!hasPermission) return;
+    setState(() {
+      isListening = true;
+      currentFrequency = 0.0;
+      currentNote = '';
+      currentVoiceType = '';
+      sustainedNote = null;
+      sustainedStartTime = null;
+      showingSustained = false;
+    });
+    final directory = await getTemporaryDirectory();
+    audioFilePath = '${directory.path}/temp_audio_${DateTime.now().millisecondsSinceEpoch}.wav';
+    if (await _recorder.hasPermission()) {
+      await _recorder.start(
+        const RecordConfig(
+          encoder: AudioEncoder.wav,
+          bitRate: 48000,
+          sampleRate: 44100,
+          numChannels: 1,
+        ),
+        path: audioFilePath!,
+      );
+      _startRealTimeAnalysis();
+    }
+  }
+
+  void _stopListening() async {
+    setState(() {
+      isListening = false;
+      currentFrequency = 0.0;
+      currentNote = '';
+      currentVoiceType = '';
+      sustainedNote = null;
+      sustainedStartTime = null;
+      showingSustained = false;
+    });
+    analysisTimer?.cancel();
+    sustainedTimer?.cancel();
+    await _recorder.stop();
+    if (audioFilePath != null && File(audioFilePath!).existsSync()) {
+      await File(audioFilePath!).delete();
+      audioFilePath = null;
+    }
+  }
+
+  void _startRealTimeAnalysis() {
+    analysisTimer = Timer.periodic(Duration(milliseconds: 200), (timer) async {
+      if (!isListening) {
+        timer.cancel();
+        return;
+      }
+      await _analyzeCurrentAudio();
+    });
+  }
+
+  Future<void> _analyzeCurrentAudio() async {
+    if (audioFilePath == null || !File(audioFilePath!).existsSync()) return;
+    try {
+      final audioFile = File(audioFilePath!);
+      final fileSize = await audioFile.length();
+      if (fileSize < 8000) return;
+      final audioBytes = await audioFile.readAsBytes();
+      List<double> samples = _convertBytesToSamples(audioBytes);
+      if (samples.length < 1000) return;
+      int sampleRate = 44100;
+      int startIndex = samples.length > sampleRate ? samples.length - sampleRate : 0;
+      List<double> recentSamples = samples.sublist(startIndex);
+      double detectedFreq = _detectPitchAutocorrelation(recentSamples);
+      if (detectedFreq > 50 && detectedFreq < 1200) {
+        _processDetectedFrequency(detectedFreq);
+      } else {
+        setState(() {
+          currentFrequency = 0.0;
+          currentNote = '';
+          currentVoiceType = '';
+        });
+      }
+    } catch (e) {}
+  }
+
+  List<double> _convertBytesToSamples(Uint8List bytes) {
+    List<double> samples = [];
+    int startIndex = 44;
+    if (bytes.length <= startIndex) return samples;
+    for (int i = startIndex; i < bytes.length - 1; i += 2) {
+      if (i + 1 < bytes.length) {
+        int sample16 = bytes[i] | (bytes[i + 1] << 8);
+        if (sample16 > 32767) sample16 -= 65536;
+        double normalizedSample = sample16 / 32768.0;
+        samples.add(normalizedSample);
+      }
+    }
+    return samples;
+  }
+
+  double _detectPitchAutocorrelation(List<double> samples) {
+    if (samples.length < 1000) return 0.0;
+    int sampleRate = 44100;
+    List<double> windowedSamples = _applyHammingWindow(samples);
+    int minPeriod = (sampleRate / 1200).round();
+    int maxPeriod = (sampleRate / 50).round();
+    double maxCorrelation = 0.0;
+    int bestPeriod = 0;
+    for (int period = minPeriod; period < maxPeriod && period < windowedSamples.length ~/ 2; period++) {
+      double correlation = 0.0;
+      int samples_to_check = windowedSamples.length - period;
+      for (int i = 0; i < samples_to_check; i++) {
+        correlation += windowedSamples[i] * windowedSamples[i + period];
+      }
+      correlation = correlation.abs();
+      if (correlation > maxCorrelation) {
+        maxCorrelation = correlation;
+        bestPeriod = period;
+      }
+    }
+    if (bestPeriod > 0 && maxCorrelation > 0.3) {
+      double frequency = sampleRate / bestPeriod;
+      return frequency;
+    }
+    return 0.0;
+  }
+
+  List<double> _applyHammingWindow(List<double> samples) {
+    List<double> windowed = [];
+    int length = samples.length;
+    for (int i = 0; i < length; i++) {
+      double window = 0.54 - 0.46 * cos(2 * pi * i / (length - 1));
+      windowed.add(samples[i] * window);
+    }
+    return windowed;
+  }
+
+  void _processDetectedFrequency(double frequency) {
+    setState(() {
+      currentFrequency = frequency;
+    });
+    Map<String, dynamic>? noteData = PreciseVoiceFrequencies.findExactNote(frequency);
+    if (noteData != null) {
+      setState(() {
+        currentNote = noteData['note'];
+        currentVoiceType = noteData['voice_type'];
+      });
+      _checkSustainedNote(currentNote, frequency, currentVoiceType);
+    } else {
+      setState(() {
+        currentNote = '';
+        currentVoiceType = '';
+        sustainedNote = null;
+        sustainedStartTime = null;
+      });
+    }
+  }
+
+  void _checkSustainedNote(String note, double frequency, String voiceType) {
+    if (sustainedNote != note) {
+      setState(() {
+        sustainedNote = note;
+        sustainedStartTime = DateTime.now();
+        showingSustained = false;
+      });
+      sustainedTimer?.cancel();
+      sustainedTimer = Timer(Duration(seconds: 3), () {
+        if (sustainedNote == note && isListening) {
+          setState(() {
+            showingSustained = true;
+          });
+          widget.onSustainedNote(note, frequency, voiceType);
+        }
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton.icon(
+              onPressed: isListening ? _stopListening : _startListening,
+              icon: Icon(isListening ? Icons.stop : Icons.mic),
+              label: Text(isListening ? 'Stop' : 'Start'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isListening ? Colors.red : Color(0xFF2196F3),
+              ),
+            ),
+            SizedBox(width: 16),
+            if (isListening && currentNote.isNotEmpty)
+              Text(
+                'Current: $currentNote',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+          ],
+        ),
+        if (!isListening && showingSustained && sustainedNote != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 12.0),
+            child: Text(
+              'Sustained Note: $sustainedNote',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF4CAF50)),
+            ),
+          ),
+      ],
+    );
   }
 }

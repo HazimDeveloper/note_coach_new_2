@@ -205,32 +205,6 @@ class SingScreen extends StatelessWidget {
               ),
             ),
             
-            SizedBox(height: 12),
-            
-            // Free Practice Button
-            _buildActionCard(
-              context,
-              'Free Practice',
-              'Practice any melody you like',
-              'Open pitch detection mode',
-              Icons.keyboard_voice,
-              Color(0xFFFF9800),
-              () => _showComingSoonDialog(context, 'Free Practice'),
-            ),
-            
-            SizedBox(height: 12),
-            
-            // Vocal Warm-up Button
-            _buildActionCard(
-              context,
-              'Vocal Warm-up',
-              'Prepare your voice for singing',
-              'Guided vocal exercises',
-              Icons.self_improvement,
-              Color(0xFF9C27B0),
-              () => _showComingSoonDialog(context, 'Vocal Warm-up'),
-            ),
-            
             SizedBox(height: 24),
             
             // Featured Songs Preview
@@ -492,7 +466,7 @@ class HomeScreen extends StatelessWidget {
                     radius: 30,
                     backgroundColor: Color(0xFF2196F3),
                     child: Text(
-                      'AH',
+                      'NC', // Changed from 'AH' to 'NC' for NoteCoach
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -506,11 +480,11 @@ class HomeScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Welcome back!',
+                          'Welcome to NoteCoach!', // Changed from 'Welcome back!'
                           style: TextStyle(color: Colors.grey[600], fontSize: 14),
                         ),
                         Text(
-                          'Amir Hakim !',
+                          'Let\'s start your musical journey!', // Changed from 'Amir Hakim !'
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 20,
