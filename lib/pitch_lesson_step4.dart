@@ -5,7 +5,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:note_coach_new_2/main.dart';
-import 'package:note_coach_new_2/vocal_range_detector_screen.dart' show EnhancedVocalRangeDetector, ImprovedVocalRangeDetector;
+import 'package:note_coach_new_2/realtime_voice_detector.dart';
 
 class PitchLessonStep4 extends StatelessWidget {
   @override
@@ -202,7 +202,7 @@ class PitchLessonStep4 extends StatelessWidget {
                       // Navigate to Vocal Range Test
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => ImprovedVocalRangeDetector()),
+                        MaterialPageRoute(builder: (context) => RealTimeVoiceDetector()),
                       );
                     },
                     icon: Icon(Icons.mic, color: Colors.white, size: 16),

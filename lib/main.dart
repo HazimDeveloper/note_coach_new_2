@@ -9,7 +9,7 @@ import 'package:note_coach_new_2/pitch_lesson_step3.dart';
 import 'package:note_coach_new_2/singing_practice_screen.dart';
 import 'package:note_coach_new_2/vocal_range_detector_screen.dart';
 import 'package:note_coach_new_2/singing_practice_screens.dart';
-
+import 'realtime_voice_detector.dart';
 void main() {
   runApp(NoteCoachApp());
 }
@@ -589,7 +589,7 @@ class HomeScreen extends StatelessWidget {
                     'Test your vocal range',
                     () => Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => ImprovedVocalRangeDetector()),
+                      MaterialPageRoute(builder: (context) => RealTimeVoiceDetector()),
                     ),
                   ),
                 ),

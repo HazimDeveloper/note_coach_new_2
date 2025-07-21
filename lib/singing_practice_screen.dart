@@ -185,7 +185,322 @@ class EnhancedSongWithPitchData {
 class PitchDetectionSongDatabase {
   static List<EnhancedSongWithPitchData> getSongs() {
     return [
-      // 1. CINTA LUAR BIASA - 29 seconds (TENOR MALE)
+      // 1. HASRAT - 28 seconds (BARITONE)
+      EnhancedSongWithPitchData(
+        title: "Hasrat",
+        artist: "Amir Jahari",
+        voiceType: "BARITONE",
+        accompanimentPath:
+            "song/AMIR JAHARI - HASRAT (OST IMAGINUR) - BARITONE-Accompaniment.mp3",
+        previewPath:
+            "song/preview/AMIR JAHARI - HASRAT (OST IMAGINUR) - BARITONE.mp3",
+        duration: Duration(seconds: 28),
+        lyricSegments: [
+          // AMIR JAHARI – HASRAT (BARITONE)
+          // B3 C4 B3 B3 – A3
+          // Te Ri Ak Lah
+          TimedLyricSegment(
+            text: "Teriaklah",
+            startTime: 2.0,
+            endTime: 5.0,
+            targetFrequency: 246.94,
+            targetNote: "B3",
+            isHighlight: true,
+            syllables: [
+              SyllableTarget(
+                syllable: "Te",
+                startTime: 0.0,
+                endTime: 0.5,
+                targetFrequency: 246.94,
+                targetNote: "B3",
+              ),
+              SyllableTarget(
+                syllable: "ri",
+                startTime: 0.5,
+                endTime: 1.0,
+                targetFrequency: 261.63,
+                targetNote: "C4",
+              ),
+              SyllableTarget(
+                syllable: "ak",
+                startTime: 1.0,
+                endTime: 1.5,
+                targetFrequency: 246.94,
+                targetNote: "B3",
+              ),
+              SyllableTarget(
+                syllable: "lah",
+                startTime: 1.5,
+                endTime: 3.0,
+                targetFrequency: 220.00,
+                targetNote: "A3",
+              ),
+            ],
+          ),
+          // B3 C4 B3 B3 A3 A3 G3 D3
+          // Se Ku At Ma Na Pun A Ku
+          TimedLyricSegment(
+            text: "sekuat mana pun aku",
+            startTime: 5.0,
+            endTime: 9.0,
+            targetFrequency: 246.94,
+            targetNote: "B3",
+            isHighlight: true,
+            syllables: [
+              SyllableTarget(
+                syllable: "se",
+                startTime: 0.0,
+                endTime: 0.5,
+                targetFrequency: 246.94,
+                targetNote: "B3",
+              ),
+              SyllableTarget(
+                syllable: "ku",
+                startTime: 0.5,
+                endTime: 1.0,
+                targetFrequency: 261.63,
+                targetNote: "C4",
+              ),
+              SyllableTarget(
+                syllable: "at",
+                startTime: 1.0,
+                endTime: 1.5,
+                targetFrequency: 246.94,
+                targetNote: "B3",
+              ),
+              SyllableTarget(
+                syllable: "ma",
+                startTime: 1.5,
+                endTime: 2.0,
+                targetFrequency: 246.94,
+                targetNote: "B3",
+              ),
+              SyllableTarget(
+                syllable: "na",
+                startTime: 2.0,
+                endTime: 2.5,
+                targetFrequency: 220.00,
+                targetNote: "A3",
+              ),
+              SyllableTarget(
+                syllable: "pun",
+                startTime: 2.5,
+                endTime: 3.0,
+                targetFrequency: 220.00,
+                targetNote: "A3",
+              ),
+              SyllableTarget(
+                syllable: "a",
+                startTime: 3.0,
+                endTime: 3.5,
+                targetFrequency: 196.00,
+                targetNote: "G3",
+              ),
+              SyllableTarget(
+                syllable: "ku",
+                startTime: 3.5,
+                endTime: 4.0,
+                targetFrequency: 146.83,
+                targetNote: "D3",
+              ),
+            ],
+          ),
+          // B3 C4 B3 – A3 G3 C4 C4 D4 B4 - A3
+          // Sua Ra Ini Ti Ada Men De Ngar
+          TimedLyricSegment(
+            text: "Suara ini",
+            startTime: 9.0,
+            endTime: 12.0,
+            targetFrequency: 246.94,
+            targetNote: "B3",
+            isHighlight: true,
+            syllables: [
+              SyllableTarget(
+                syllable: "Su",
+                startTime: 0.0,
+                endTime: 0.5,
+                targetFrequency: 246.94,
+                targetNote: "B3",
+              ),
+              SyllableTarget(
+                syllable: "a",
+                startTime: 0.5,
+                endTime: 1.0,
+                targetFrequency: 261.63,
+                targetNote: "C4",
+              ),
+              SyllableTarget(
+                syllable: "ra",
+                startTime: 1.0,
+                endTime: 1.5,
+                targetFrequency: 246.94,
+                targetNote: "B3",
+              ),
+              SyllableTarget(
+                syllable: "ini",
+                startTime: 1.5,
+                endTime: 3.0,
+                targetFrequency: 220.00,
+                targetNote: "A3",
+              ),
+            ],
+          ),
+          TimedLyricSegment(
+            text: "tiada mendengar",
+            startTime: 12.0,
+            endTime: 16.0,
+            targetFrequency: 220.00,
+            targetNote: "A3",
+            isHighlight: true,
+            syllables: [
+              SyllableTarget(
+                syllable: "ti",
+                startTime: 0.0,
+                endTime: 0.5,
+                targetFrequency: 196.00,
+                targetNote: "G3",
+              ),
+              SyllableTarget(
+                syllable: "a",
+                startTime: 0.5,
+                endTime: 1.0,
+                targetFrequency: 261.63,
+                targetNote: "C4",
+              ),
+              SyllableTarget(
+                syllable: "da",
+                startTime: 1.0,
+                endTime: 1.5,
+                targetFrequency: 261.63,
+                targetNote: "C4",
+              ),
+              SyllableTarget(
+                syllable: "men",
+                startTime: 1.5,
+                endTime: 2.0,
+                targetFrequency: 293.66,
+                targetNote: "D4",
+              ),
+              SyllableTarget(
+                syllable: "de",
+                startTime: 2.0,
+                endTime: 2.5,
+                targetFrequency: 493.88,
+                targetNote: "B4",
+              ),
+              SyllableTarget(
+                syllable: "ngar",
+                startTime: 2.5,
+                endTime: 4.0,
+                targetFrequency: 220.00,
+                targetNote: "A3",
+              ),
+            ],
+          ),
+          // B3 C4 B3 B3 – A3
+          // Te Ri Ak Lah
+          TimedLyricSegment(
+            text: "Teriaklah",
+            startTime: 16.0,
+            endTime: 20.0,
+            targetFrequency: 246.94,
+            targetNote: "B3",
+            isHighlight: true,
+            syllables: [
+              SyllableTarget(
+                syllable: "Te",
+                startTime: 0.0,
+                endTime: 0.5,
+                targetFrequency: 246.94,
+                targetNote: "B3",
+              ),
+              SyllableTarget(
+                syllable: "ri",
+                startTime: 0.5,
+                endTime: 1.0,
+                targetFrequency: 261.63,
+                targetNote: "C4",
+              ),
+              SyllableTarget(
+                syllable: "ak",
+                startTime: 1.0,
+                endTime: 1.5,
+                targetFrequency: 246.94,
+                targetNote: "B3",
+              ),
+              SyllableTarget(
+                syllable: "lah",
+                startTime: 1.5,
+                endTime: 4.0,
+                targetFrequency: 220.00,
+                targetNote: "A3",
+              ),
+            ],
+          ),
+          // B3 C4 B3 B3 A3 G3 E3
+          // Ber Hen Ti Lah Ber Ha Rap
+          TimedLyricSegment(
+            text: "Berhentilah berharap",
+            startTime: 20.0,
+            endTime: 24.0,
+            targetFrequency: 196.00,
+            targetNote: "G3",
+            isHighlight: true,
+            syllables: [
+              SyllableTarget(
+                syllable: "Ber",
+                startTime: 0.0,
+                endTime: 0.5,
+                targetFrequency: 246.94,
+                targetNote: "B3",
+              ),
+              SyllableTarget(
+                syllable: "hen",
+                startTime: 0.5,
+                endTime: 1.0,
+                targetFrequency: 261.63,
+                targetNote: "C4",
+              ),
+              SyllableTarget(
+                syllable: "ti",
+                startTime: 1.0,
+                endTime: 1.5,
+                targetFrequency: 246.94,
+                targetNote: "B3",
+              ),
+              SyllableTarget(
+                syllable: "lah",
+                startTime: 1.5,
+                endTime: 2.0,
+                targetFrequency: 246.94,
+                targetNote: "B3",
+              ),
+              SyllableTarget(
+                syllable: "ber",
+                startTime: 2.0,
+                endTime: 2.5,
+                targetFrequency: 220.00,
+                targetNote: "A3",
+              ),
+              SyllableTarget(
+                syllable: "ha",
+                startTime: 2.5,
+                endTime: 3.0,
+                targetFrequency: 196.00,
+                targetNote: "G3",
+              ),
+              SyllableTarget(
+                syllable: "rap",
+                startTime: 3.0,
+                endTime: 4.0,
+                targetFrequency: 164.81,
+                targetNote: "E3",
+              ),
+            ],
+          ),
+        ],
+      ),
+      // 2. CINTA LUAR BIASA - 29 seconds (TENOR MALE)
       EnhancedSongWithPitchData(
         title: "Cinta Luar Biasa",
         artist: "Andmesh Kamaleng",
@@ -542,8 +857,7 @@ class PitchDetectionSongDatabase {
           ),
         ],
       ),
-
-      // 2. BUKAN CINTA BIASA - 25 seconds (TENOR FEMALE)
+      // 3. BUKAN CINTA BIASA - 25 seconds (TENOR FEMALE)
       EnhancedSongWithPitchData(
         title: "Bukan Cinta Biasa",
         artist: "Dato' Siti Nurhaliza",
@@ -951,8 +1265,7 @@ class PitchDetectionSongDatabase {
           ),
         ],
       ),
-
-      // 3. JANGAN MATI RASA ITU - 32 seconds (ALTO)
+      // 4. JANGAN MATI RASA ITU - 32 seconds (ALTO)
       EnhancedSongWithPitchData(
         title: "Jangan Mati Rasa Itu",
         artist: "Aina Abdul",
@@ -1252,322 +1565,6 @@ class PitchDetectionSongDatabase {
                 endTime: 3.0,
                 targetFrequency: 261.63,
                 targetNote: "C4",
-              ),
-            ],
-          ),
-        ],
-      ),
-
-      // 4. HASRAT - 28 seconds (BARITONE)
-      EnhancedSongWithPitchData(
-        title: "Hasrat",
-        artist: "Amir Jahari",
-        voiceType: "BARITONE",
-        accompanimentPath:
-            "song/AMIR JAHARI - HASRAT (OST IMAGINUR) - BARITONE-Accompaniment.mp3",
-        previewPath:
-            "song/preview/AMIR JAHARI - HASRAT (OST IMAGINUR) - BARITONE.mp3",
-        duration: Duration(seconds: 28),
-        lyricSegments: [
-          // AMIR JAHARI – HASRAT (BARITONE)
-          // B3 C4 B3 B3 – A3
-          // Te Ri Ak Lah
-          TimedLyricSegment(
-            text: "Teriaklah",
-            startTime: 2.0,
-            endTime: 5.0,
-            targetFrequency: 246.94,
-            targetNote: "B3",
-            isHighlight: true,
-            syllables: [
-              SyllableTarget(
-                syllable: "Te",
-                startTime: 0.0,
-                endTime: 0.5,
-                targetFrequency: 246.94,
-                targetNote: "B3",
-              ),
-              SyllableTarget(
-                syllable: "ri",
-                startTime: 0.5,
-                endTime: 1.0,
-                targetFrequency: 261.63,
-                targetNote: "C4",
-              ),
-              SyllableTarget(
-                syllable: "ak",
-                startTime: 1.0,
-                endTime: 1.5,
-                targetFrequency: 246.94,
-                targetNote: "B3",
-              ),
-              SyllableTarget(
-                syllable: "lah",
-                startTime: 1.5,
-                endTime: 3.0,
-                targetFrequency: 220.00,
-                targetNote: "A3",
-              ),
-            ],
-          ),
-          // B3 C4 B3 B3 A3 A3 G3 D3
-          // Se Ku At Ma Na Pun A Ku
-          TimedLyricSegment(
-            text: "sekuat mana pun aku",
-            startTime: 5.0,
-            endTime: 9.0,
-            targetFrequency: 246.94,
-            targetNote: "B3",
-            isHighlight: true,
-            syllables: [
-              SyllableTarget(
-                syllable: "se",
-                startTime: 0.0,
-                endTime: 0.5,
-                targetFrequency: 246.94,
-                targetNote: "B3",
-              ),
-              SyllableTarget(
-                syllable: "ku",
-                startTime: 0.5,
-                endTime: 1.0,
-                targetFrequency: 261.63,
-                targetNote: "C4",
-              ),
-              SyllableTarget(
-                syllable: "at",
-                startTime: 1.0,
-                endTime: 1.5,
-                targetFrequency: 246.94,
-                targetNote: "B3",
-              ),
-              SyllableTarget(
-                syllable: "ma",
-                startTime: 1.5,
-                endTime: 2.0,
-                targetFrequency: 246.94,
-                targetNote: "B3",
-              ),
-              SyllableTarget(
-                syllable: "na",
-                startTime: 2.0,
-                endTime: 2.5,
-                targetFrequency: 220.00,
-                targetNote: "A3",
-              ),
-              SyllableTarget(
-                syllable: "pun",
-                startTime: 2.5,
-                endTime: 3.0,
-                targetFrequency: 220.00,
-                targetNote: "A3",
-              ),
-              SyllableTarget(
-                syllable: "a",
-                startTime: 3.0,
-                endTime: 3.5,
-                targetFrequency: 196.00,
-                targetNote: "G3",
-              ),
-              SyllableTarget(
-                syllable: "ku",
-                startTime: 3.5,
-                endTime: 4.0,
-                targetFrequency: 146.83,
-                targetNote: "D3",
-              ),
-            ],
-          ),
-          // B3 C4 B3 – A3 G3 C4 C4 D4 B4 - A3
-          // Sua Ra Ini Ti Ada Men De Ngar
-          TimedLyricSegment(
-            text: "Suara ini",
-            startTime: 9.0,
-            endTime: 12.0,
-            targetFrequency: 246.94,
-            targetNote: "B3",
-            isHighlight: true,
-            syllables: [
-              SyllableTarget(
-                syllable: "Su",
-                startTime: 0.0,
-                endTime: 0.5,
-                targetFrequency: 246.94,
-                targetNote: "B3",
-              ),
-              SyllableTarget(
-                syllable: "a",
-                startTime: 0.5,
-                endTime: 1.0,
-                targetFrequency: 261.63,
-                targetNote: "C4",
-              ),
-              SyllableTarget(
-                syllable: "ra",
-                startTime: 1.0,
-                endTime: 1.5,
-                targetFrequency: 246.94,
-                targetNote: "B3",
-              ),
-              SyllableTarget(
-                syllable: "ini",
-                startTime: 1.5,
-                endTime: 3.0,
-                targetFrequency: 220.00,
-                targetNote: "A3",
-              ),
-            ],
-          ),
-          TimedLyricSegment(
-            text: "tiada mendengar",
-            startTime: 12.0,
-            endTime: 16.0,
-            targetFrequency: 220.00,
-            targetNote: "A3",
-            isHighlight: true,
-            syllables: [
-              SyllableTarget(
-                syllable: "ti",
-                startTime: 0.0,
-                endTime: 0.5,
-                targetFrequency: 196.00,
-                targetNote: "G3",
-              ),
-              SyllableTarget(
-                syllable: "a",
-                startTime: 0.5,
-                endTime: 1.0,
-                targetFrequency: 261.63,
-                targetNote: "C4",
-              ),
-              SyllableTarget(
-                syllable: "da",
-                startTime: 1.0,
-                endTime: 1.5,
-                targetFrequency: 261.63,
-                targetNote: "C4",
-              ),
-              SyllableTarget(
-                syllable: "men",
-                startTime: 1.5,
-                endTime: 2.0,
-                targetFrequency: 293.66,
-                targetNote: "D4",
-              ),
-              SyllableTarget(
-                syllable: "de",
-                startTime: 2.0,
-                endTime: 2.5,
-                targetFrequency: 493.88,
-                targetNote: "B4",
-              ),
-              SyllableTarget(
-                syllable: "ngar",
-                startTime: 2.5,
-                endTime: 4.0,
-                targetFrequency: 220.00,
-                targetNote: "A3",
-              ),
-            ],
-          ),
-          // B3 C4 B3 B3 – A3
-          // Te Ri Ak Lah
-          TimedLyricSegment(
-            text: "Teriaklah",
-            startTime: 16.0,
-            endTime: 20.0,
-            targetFrequency: 246.94,
-            targetNote: "B3",
-            isHighlight: true,
-            syllables: [
-              SyllableTarget(
-                syllable: "Te",
-                startTime: 0.0,
-                endTime: 0.5,
-                targetFrequency: 246.94,
-                targetNote: "B3",
-              ),
-              SyllableTarget(
-                syllable: "ri",
-                startTime: 0.5,
-                endTime: 1.0,
-                targetFrequency: 261.63,
-                targetNote: "C4",
-              ),
-              SyllableTarget(
-                syllable: "ak",
-                startTime: 1.0,
-                endTime: 1.5,
-                targetFrequency: 246.94,
-                targetNote: "B3",
-              ),
-              SyllableTarget(
-                syllable: "lah",
-                startTime: 1.5,
-                endTime: 4.0,
-                targetFrequency: 220.00,
-                targetNote: "A3",
-              ),
-            ],
-          ),
-          // B3 C4 B3 B3 A3 G3 E3
-          // Ber Hen Ti Lah Ber Ha Rap
-          TimedLyricSegment(
-            text: "Berhentilah berharap",
-            startTime: 20.0,
-            endTime: 24.0,
-            targetFrequency: 196.00,
-            targetNote: "G3",
-            isHighlight: true,
-            syllables: [
-              SyllableTarget(
-                syllable: "Ber",
-                startTime: 0.0,
-                endTime: 0.5,
-                targetFrequency: 246.94,
-                targetNote: "B3",
-              ),
-              SyllableTarget(
-                syllable: "hen",
-                startTime: 0.5,
-                endTime: 1.0,
-                targetFrequency: 261.63,
-                targetNote: "C4",
-              ),
-              SyllableTarget(
-                syllable: "ti",
-                startTime: 1.0,
-                endTime: 1.5,
-                targetFrequency: 246.94,
-                targetNote: "B3",
-              ),
-              SyllableTarget(
-                syllable: "lah",
-                startTime: 1.5,
-                endTime: 2.0,
-                targetFrequency: 246.94,
-                targetNote: "B3",
-              ),
-              SyllableTarget(
-                syllable: "ber",
-                startTime: 2.0,
-                endTime: 2.5,
-                targetFrequency: 220.00,
-                targetNote: "A3",
-              ),
-              SyllableTarget(
-                syllable: "ha",
-                startTime: 2.5,
-                endTime: 3.0,
-                targetFrequency: 196.00,
-                targetNote: "G3",
-              ),
-              SyllableTarget(
-                syllable: "rap",
-                startTime: 3.0,
-                endTime: 4.0,
-                targetFrequency: 164.81,
-                targetNote: "E3",
               ),
             ],
           ),
@@ -1880,7 +1877,7 @@ class _EnhancedSingingPracticeWithPitchState
             setState(() {
               currentTime = audioTime;
             });
-            _updateCurrentSegment();
+         
           }
         }
       } catch (e) {
@@ -2309,9 +2306,6 @@ class _EnhancedSingingPracticeWithPitchState
           centsDiff.abs() < pitchTolerance &&
           currentAccuracy > accuracyThreshold;
 
-      // Update visual feedback
-      _updateRealTimeFeedback();
-
       // Store performance data only when we have a valid segment
       _recordPerformanceData();
 
@@ -2484,62 +2478,15 @@ class _EnhancedSingingPracticeWithPitchState
   double _calculatePitchAccuracy(double detectedFreq, double targetFreq) {
     if (targetFreq == 0 || detectedFreq == 0) return 0.0;
 
-    double ratio = detectedFreq / targetFreq;
-    double cents = 1200 * log(ratio) / ln2;
+    // Calculate min and max acceptable frequency (±50 cents)
+    double minFreq = targetFreq * pow(2, -50 / 1200);
+    double maxFreq = targetFreq * pow(2, 50 / 1200);
 
-    // Voice type specific tolerance levels based on vocal range characteristics
-    String voiceType = widget.song.voiceType.toUpperCase();
-    double tolerance;
-
-    switch (voiceType) {
-      case 'BARITONE':
-        tolerance = 20.0; // Baritones typically have more stable lower range
-        break;
-      case 'TENOR MALE':
-      case 'TENOR':
-        tolerance = 18.0; // Tenors have good control in their range
-        break;
-      case 'TENOR FEMALE':
-        tolerance = 16.0; // Female tenors often have precise control
-        break;
-      case 'ALTO':
-        tolerance = 22.0; // Altos have wider natural range
-        break;
-      default:
-        tolerance = 20.0;
-    }
-
-    // More precise accuracy calculation based on voice type
-    double accuracy;
-    if (cents.abs() <= tolerance * 0.6) {
-      accuracy = 1.0; // Perfect pitch
-    } else if (cents.abs() <= tolerance) {
-      accuracy =
-          0.95 -
-          (cents.abs() - tolerance * 0.6) /
-              (tolerance * 0.4) *
-              0.15; // 80-95% for excellent
-    } else if (cents.abs() <= tolerance * 1.5) {
-      accuracy =
-          0.8 -
-          (cents.abs() - tolerance) /
-              (tolerance * 0.5) *
-              0.25; // 55-80% for good
-    } else if (cents.abs() <= tolerance * 2.5) {
-      accuracy =
-          0.55 -
-          (cents.abs() - tolerance * 1.5) / tolerance * 0.35; // 20-55% for fair
-    } else if (cents.abs() <= tolerance * 4.0) {
-      accuracy =
-          0.2 -
-          (cents.abs() - tolerance * 2.5) /
-              (tolerance * 1.5) *
-              0.15; // 5-20% for poor
+    if (detectedFreq >= minFreq && detectedFreq <= maxFreq) {
+      return 1.0; // Perfect score if within range
     } else {
-      accuracy = 0.05; // Very poor
+      return 0.0;
     }
-
-    return accuracy.clamp(0.0, 1.0);
   }
 
   void _updateRealTimeFeedback() {
@@ -2876,6 +2823,9 @@ class _EnhancedSingingPracticeWithPitchState
       widget.song.voiceType,
     );
 
+    // Display current lyric at the top
+    Widget lyricDisplay = Container();
+   
     return Scaffold(
       appBar: AppBar(
         title: Text('${widget.song.title} - Karaoke'),
@@ -2892,6 +2842,7 @@ class _EnhancedSingingPracticeWithPitchState
       ),
       body: Column(
         children: [
+          lyricDisplay,
           // Header with song info
           Container(
             padding: EdgeInsets.all(16),
@@ -3008,11 +2959,6 @@ class _EnhancedSingingPracticeWithPitchState
                     minHeight: 6,
                   ),
                   // Debug info
-                  SizedBox(height: 8),
-                  Text(
-                    'Debug: Time=${currentTime.toStringAsFixed(1)}s, Segments=${widget.song.lyricSegments.length}, Current=${currentSegment?.text ?? "None"}',
-                    style: TextStyle(color: Colors.grey[500], fontSize: 10),
-                  ),
                 ],
               ),
             ),
@@ -3020,17 +2966,11 @@ class _EnhancedSingingPracticeWithPitchState
 
           // Current lyrics display
           SizedBox(height: 20),
-          if (isPlaying && !showInstructions)
+          if (isPlaying && !showInstructions && currentSegment != null)
             AnimatedBuilder(
               animation: lyricAnimation!,
               builder: (context, child) {
-                // Get the appropriate lyric to display
-                TimedLyricSegment? displaySegment =
-                    currentSegment ?? lastDisplayedSegment;
-
-                // If no current segment (instrumental), keep showing the last lyrics
-                // This helps users remember what they just sang and prepare for next part
-
+                // Only show the current active lyric (no last/next/duplicate)
                 return Transform.scale(
                   scale: lyricAnimation!.value,
                   child: Container(
@@ -3038,7 +2978,7 @@ class _EnhancedSingingPracticeWithPitchState
                     margin: EdgeInsets.symmetric(horizontal: 20),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: displaySegment?.isHighlight == true
+                        colors: currentSegment!.isHighlight
                             ? [
                                 Color(0xFFFFD700).withOpacity(0.2),
                                 Color(0xFFFFD700).withOpacity(0.1),
@@ -3052,67 +2992,37 @@ class _EnhancedSingingPracticeWithPitchState
                       ),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: displaySegment?.isHighlight == true
+                        color: currentSegment!.isHighlight
                             ? Color(0xFFFFD700).withOpacity(0.5)
                             : currentFeedbackColor.withOpacity(0.3),
-                        width: displaySegment?.isHighlight == true ? 2 : 1,
+                        width: currentSegment!.isHighlight ? 2 : 1,
                       ),
                     ),
                     child: Column(
                       children: [
-                        if (displaySegment?.isHighlight == true)
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.star,
-                                color: Color(0xFFFFD700),
-                                size: 16,
-                              ),
-                              SizedBox(width: 4),
-                              Text(
-                                'KEY MOMENT',
-                                style: TextStyle(
-                                  color: Color(0xFFFFD700),
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              SizedBox(width: 4),
-                              Icon(
-                                Icons.star,
-                                color: Color(0xFFFFD700),
-                                size: 16,
-                              ),
-                            ],
-                          ),
-                        if (displaySegment?.isHighlight == true)
+                          
+                        if (currentSegment!.isHighlight)
                           SizedBox(height: 8),
                         Text(
-                          displaySegment?.text ?? '',
+                          currentSegment!.text,
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: displaySegment?.isHighlight == true
-                                ? 28
-                                : 24,
+                            fontSize: currentSegment!.isHighlight ? 28 : 24,
                             fontWeight: FontWeight.bold,
-                            color: displaySegment?.isHighlight == true
+                            color: currentSegment!.isHighlight
                                 ? Color(0xFFFFD700)
                                 : currentFeedbackColor,
                             height: 1.3,
                           ),
                         ),
                         SizedBox(height: 8),
-                        if (displaySegment != null &&
-                            currentSegment != null) ...[
-                          Text(
-                            'Voice Type: ${widget.song.voiceType}',
-                            style: TextStyle(
-                              color: Colors.grey[500],
-                              fontSize: 10,
-                            ),
+                        Text(
+                          'Voice Type: ${widget.song.voiceType}',
+                          style: TextStyle(
+                            color: Colors.grey[500],
+                            fontSize: 10,
                           ),
-                        ],
+                        ),
                       ],
                     ),
                   ),
@@ -3457,9 +3367,8 @@ class KaraokeAnalysisScreen extends StatelessWidget {
 
     // Calculate additional metrics
     int totalSegments = performanceHistory.length;
-    int correctSegments = performanceHistory.where((p) => p.wasOnPitch).length;
     double consistencyScore = totalSegments > 0
-        ? correctSegments / totalSegments
+        ? performanceHistory.where((p) => p.wasOnPitch).length / totalSegments
         : 0.0;
 
     // Find best and worst performances
@@ -3470,495 +3379,267 @@ class KaraokeAnalysisScreen extends StatelessWidget {
         ? performanceHistory.reduce((a, b) => a.accuracy < b.accuracy ? a : b)
         : null;
 
+    // Star rating (out of 5)
+    int starRating = (overallAccuracy * 5).clamp(1, 5).round();
+
     return Scaffold(
+      backgroundColor: Color(0xFFF6F8FB),
       appBar: AppBar(
-        title: Text('Karaoke Analysis'),
-        centerTitle: true,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.of(context).pop(),
         ),
+        title: null,
+        automaticallyImplyLeading: true,
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(20),
+      body: SafeArea(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Overall Results Header
-            Container(
-              padding: EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [voiceColor.withOpacity(0.1), Colors.white],
-                ),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: voiceColor.withOpacity(0.3)),
+            SizedBox(height: 8),
+            // Big header
+            Text(
+              'Singing Practice Summary',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF22223b),
+                letterSpacing: 0.5,
               ),
-              child: Column(
+            ),
+            SizedBox(height: 18),
+            // Info Card: Song title, artist, and 3 info boxes
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xFFe0e7ff), Color(0xFFf1f5ff)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(18),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 8,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(
+                              color: Color(0xFF4f46e5),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(Icons.library_music, color: Colors.white, size: 26),
+                          ),
+                          SizedBox(width: 14),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(song.title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF22223b))),
+                              SizedBox(height: 2),
+                              Text('by ${song.artist}', style: TextStyle(fontSize: 13, color: Color(0xFF6366f1))),
+                            ],
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 18),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: _infoBox(_formatDuration(totalPracticeTime), 'Duration', Color(0xFF38bdf8)),
+                          ),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: _infoBox(song.voiceType.toUpperCase(), 'Voice Type', Color(0xFF6366f1)),
+                          ),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: _infoBox('$totalSegments', 'Segments', Color(0xFFa78bfa)),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 24),
+            // Center highlight: Overall Score & Consistency
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: voiceColor,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(Icons.queue_music, color: Colors.white),
-                      ),
-                      SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              song.title,
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                            Text(
-                              'by ${song.artist} • ${song.voiceType}',
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 13,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                  Expanded(
+                    child: _highlightBox('${(overallAccuracy * 100).toInt()}%', 'Overall Score', Color(0xFFfbbf24)),
                   ),
-                  SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildStatCard(
-                          'Overall Score',
-                          '${(overallAccuracy * 100).toInt()}%',
-                          overallAccuracy > 0.8
-                              ? Color(0xFF4CAF50)
-                              : overallAccuracy > 0.6
-                              ? Color(0xFFFF9800)
-                              : Color(0xFFF44336),
-                        ),
-                      ),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: _buildStatCard(
-                          'Consistency',
-                          '${(consistencyScore * 100).toInt()}%',
-                          consistencyScore > 0.8
-                              ? Color(0xFF4CAF50)
-                              : consistencyScore > 0.6
-                              ? Color(0xFFFF9800)
-                              : Color(0xFFF44336),
-                        ),
-                      ),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: _buildStatCard(
-                          'Segments',
-                          '$totalSegments',
-                          Color(0xFF9C27B0),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildStatCard(
-                          'Practice Time',
-                          '${totalPracticeTime.inMinutes}:${(totalPracticeTime.inSeconds % 60).toString().padLeft(2, '0')}',
-                          Color(0xFF2196F3),
-                        ),
-                      ),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: _buildStatCard(
-                          'Correct',
-                          '$correctSegments',
-                          Color(0xFF4CAF50),
-                        ),
-                      ),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: _buildStatCard(
-                          'Voice Type',
-                          song.voiceType.split(' ').first,
-                          voiceColor,
-                        ),
-                      ),
-                    ],
+                  SizedBox(width: 18),
+                  Expanded(
+                    child: _highlightBox('${(consistencyScore * 100).toInt()}%', 'Consistency', Color(0xFFf59e42)),
                   ),
                 ],
               ),
             ),
-
-            SizedBox(height: 24),
-
-            // Performance Breakdown
-            Text(
-              'Performance Breakdown',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
+            SizedBox(height: 18),
+            // Insights Card
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Color(0xFFede9fe),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                padding: EdgeInsets.all(18),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.insights, color: Color(0xFFa21caf)),
+                        SizedBox(width: 8),
+                        Text('Karaoke Insights', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFa21caf), fontSize: 16)),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    _insightRow('🌟', 'Excellent work on the key moments!'),
+                    _insightRow('🎵', "You've mastered the important parts of the song"),
+                    _insightRow('📋', 'Work on consistency in regular sections'),
+                    _insightRow('🚀', 'Try more challenging songs to continue improving'),
+                  ],
+                ),
+              ),
+            ),
+            Spacer(),
+            // Action Buttons
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: onRestart,
+                      icon: Icon(Icons.refresh, color: Color(0xFF6366f1)),
+                      label: Text('Sing Again', style: TextStyle(color: Color(0xFF6366f1), fontWeight: FontWeight.bold)),
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: Color(0xFF6366f1)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: EdgeInsets.symmetric(vertical: 14),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 16),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                      },
+                      icon: Icon(Icons.home, color: Colors.white),
+                      label: Text('Back to Home', style: TextStyle(fontWeight: FontWeight.bold)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF6366f1),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: EdgeInsets.symmetric(vertical: 14),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             SizedBox(height: 16),
-
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Color(0xFFFFD700).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Color(0xFFFFD700).withOpacity(0.3)),
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.star, color: Color(0xFFFFD700), size: 20),
-                      SizedBox(width: 4),
-                      Text(
-                        'KEY MOMENTS',
-                        style: TextStyle(
-                          color: Color(0xFFFFD700),
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    '${(highlightAccuracy * 100).toInt()}%',
-                    style: TextStyle(
-                      color: Color(0xFFFFD700),
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    '${highlightPerformances.length} lyrics',
-                    style: TextStyle(color: Color(0xFFFFD700), fontSize: 11),
-                  ),
-                ],
-              ),
-            ),
-
-            SizedBox(height: 24),
-
-            // Best and Worst Performances
-            if (bestPerformance != null && worstPerformance != null) ...[
-              Text(
-                'Performance Highlights',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              SizedBox(height: 16),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      padding: EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Color(0xFF4CAF50).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Color(0xFF4CAF50).withOpacity(0.3),
-                        ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.trending_up,
-                                color: Color(0xFF4CAF50),
-                                size: 16,
-                              ),
-                              SizedBox(width: 4),
-                              Text(
-                                'BEST PERFORMANCE',
-                                style: TextStyle(
-                                  color: Color(0xFF4CAF50),
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            bestPerformance.segment.text,
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            '${(bestPerformance.accuracy * 100).toInt()}% accuracy',
-                            style: TextStyle(
-                              color: Color(0xFF4CAF50),
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: Container(
-                      padding: EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Color(0xFFF44336).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Color(0xFFF44336).withOpacity(0.3),
-                        ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.trending_down,
-                                color: Color(0xFFF44336),
-                                size: 16,
-                              ),
-                              SizedBox(width: 4),
-                              Text(
-                                'NEEDS WORK',
-                                style: TextStyle(
-                                  color: Color(0xFFF44336),
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            worstPerformance.segment.text,
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            '${(worstPerformance.accuracy * 100).toInt()}% accuracy',
-                            style: TextStyle(
-                              color: Color(0xFFF44336),
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              SizedBox(height: 24),
-            ],
-
-            // Performance insights
-            Container(
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Color(0xFFF3E5F5),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Color(0xFF9C27B0).withOpacity(0.3)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.insights, color: Color(0xFF9C27B0)),
-                      SizedBox(width: 8),
-                      Text(
-                        'Karaoke Insights',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF9C27B0),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 12),
-                  _buildInsightsText(
-                    highlightAccuracy,
-                    regularAccuracy,
-                    overallAccuracy,
-                    consistencyScore,
-                  ),
-                ],
-              ),
-            ),
-
-            SizedBox(height: 24),
-
-            // Action buttons
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: onRestart,
-                    icon: Icon(Icons.refresh, color: voiceColor),
-                    label: Text(
-                      'Sing Again',
-                      style: TextStyle(color: voiceColor),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: voiceColor),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      Navigator.pop(context);
-                    },
-                    icon: Icon(Icons.home, color: Colors.white),
-                    label: Text('Back to Home'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: voiceColor,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                    ),
-                  ),
-                ),
-              ],
-            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildInsightsText(
-    double highlightAccuracy,
-    double regularAccuracy,
-    double overallAccuracy,
-    double consistencyScore,
-  ) {
-    if (overallAccuracy > 0.9) {
-      return Text(
-        '🌟 Outstanding performance! You\'ve mastered this song!\n'
-        '🎯 Your pitch accuracy is exceptional across all sections\n'
-        '🚀 Try more challenging songs to continue improving\n'
-        '⭐ Consider recording your performance to share',
-        style: TextStyle(color: Colors.grey[700], height: 1.4),
-      );
-    } else if (overallAccuracy > 0.8) {
-      return Text(
-        '🌟 Excellent work! You\'re very close to perfection!\n'
-        '🎯 Focus on the sections that scored slightly lower\n'
-        '📈 Your consistency shows great practice habits\n'
-        '🎵 Try singing with more emotion and expression',
-        style: TextStyle(color: Colors.grey[700], height: 1.4),
-      );
-    } else if (highlightAccuracy < regularAccuracy) {
-      return Text(
-        '🌟 Focus more on the starred moments - they\'re the key parts!\n'
-        '🎯 Practice the important sections to improve your score\n'
-        '📈 Your regular singing is good, now master the highlights\n'
-        '🎧 Listen to the original song more to internalize the melody',
-        style: TextStyle(color: Colors.grey[700], height: 1.4),
-      );
-    } else if (highlightAccuracy > 0.8) {
-      return Text(
-        '🌟 Excellent work on the key moments!\n'
-        '🎵 You\'ve mastered the important parts of the song\n'
-        '🔄 Work on consistency in regular sections\n'
-        '🚀 Try more challenging songs to continue improving',
-        style: TextStyle(color: Colors.grey[700], height: 1.4),
-      );
-    } else if (consistencyScore < 0.5) {
-      return Text(
-        '🎯 Good progress! Focus on consistency\n'
-        '🎧 Listen to the original song more to internalize the melody\n'
-        '⭐ Pay special attention to the starred moments\n'
-        '🔄 Practice each section multiple times for better accuracy',
-        style: TextStyle(color: Colors.grey[700], height: 1.4),
-      );
-    } else {
-      return Text(
-        '🎯 Good progress! Focus on both key and regular sections\n'
-        '🎧 Listen to the original song more to internalize the melody\n'
-        '⭐ Pay special attention to the starred moments\n'
-        '🔄 Practice with a metronome to improve timing',
-        style: TextStyle(color: Colors.grey[700], height: 1.4),
-      );
-    }
-  }
-
-  Widget _buildStatCard(String label, String value, Color color) {
+  Widget _infoBox(String value, String label, Color color, {bool center = false}) {
     return Container(
-      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3)),
+        color: color.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(12),
       ),
+      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 8),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
             value,
             style: TextStyle(
-              color: color,
-              fontSize: 16,
               fontWeight: FontWeight.bold,
+              fontSize: 12,
+              color: color,
             ),
+            textAlign: center ? TextAlign.center : TextAlign.start,
           ),
           SizedBox(height: 4),
           Text(
             label,
-            style: TextStyle(
-              color: color,
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
-            ),
-            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 12, color: color),
+            textAlign: center ? TextAlign.center : TextAlign.start,
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _insightRow(String emoji, String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2.5),
+      child: Row(
+        children: [
+          Text(emoji, style: TextStyle(fontSize: 16)),
+          SizedBox(width: 8),
+          Expanded(child: Text(text, style: TextStyle(fontSize: 14, color: Color(0xFF4b5563)))),
+        ],
+      ),
+    );
+  }
+
+  // Add this helper to KaraokeAnalysisScreen
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    return '${twoDigits(duration.inMinutes)}:${twoDigits(duration.inSeconds.remainder(60))}';
+  }
+
+  Widget _highlightBox(String value, String label, Color color) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 2),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.13),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color.withOpacity(0.5), width: 2),
+      ),
+      padding: EdgeInsets.symmetric(vertical: 24, horizontal: 8),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(value, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28, color: color)),
+          SizedBox(height: 8),
+          Text(label, style: TextStyle(fontSize: 15, color: color, fontWeight: FontWeight.w600)),
         ],
       ),
     );
